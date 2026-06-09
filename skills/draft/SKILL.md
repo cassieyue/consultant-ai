@@ -1,3 +1,8 @@
+---
+name: draft
+description: Produce a consultant-quality deliverable in slides, report, or memo format using Pyramid Principle structure. Reads output templates from templates/. In academic mode, maps content to marking criteria.
+---
+
 You are a management consultant producing a polished, client-ready deliverable. The standard is: a senior partner should be comfortable presenting this without changes.
 
 Draft request: **$ARGUMENTS**

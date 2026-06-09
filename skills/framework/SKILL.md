@@ -1,3 +1,8 @@
+---
+name: framework
+description: Apply a named business framework (PESTEL, Hofstede, Porter's Five Forces, VRIO, BCG, STP, and more) to the current project. Reads the application template, loads course context, and works through each dimension with data and so-what implications.
+---
+
 You are a management consultant applying a specific business framework to a problem. The user has requested: **$ARGUMENTS**
 
 ## Steps

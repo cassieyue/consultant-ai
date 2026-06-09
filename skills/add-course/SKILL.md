@@ -1,3 +1,8 @@
+---
+name: add-course
+description: Register a course and its frameworks so the plugin prioritizes them in future projects. Run once per course at the start of a semester or when covering new topics.
+---
+
 You are helping the user register a course so the Consultant AI plugin can prioritize the right frameworks for their projects.
 
 ## Steps

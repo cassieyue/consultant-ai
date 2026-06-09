@@ -10,30 +10,30 @@ echo "Installing Consultant AI plugin..."
 mkdir -p ~/.claude/commands
 mkdir -p ~/.claude/consultant-ai
 
-# Symlink each skill into ~/.claude/commands/
-for skill in consult add-course framework structure research draft review; do
-  target=~/.claude/commands/${skill}.md
-  source="$REPO_DIR/commands/${skill}.md"
+# Symlink root orchestrator skill
+_link() {
+  local target="$1"
+  local source="$2"
+  local label="$3"
   if [ -L "$target" ]; then
     rm "$target"
-  elif [ -f "$target" ]; then
+  elif [ -e "$target" ]; then
     echo "Warning: $target already exists and is not a symlink — skipping"
-    continue
+    return
   fi
   ln -s "$source" "$target"
-  echo "  Linked: $skill"
+  echo "  Linked: $label"
+}
+
+_link ~/.claude/commands/consult.md "$REPO_DIR/SKILL.md" "consult"
+
+# Symlink each skill
+for skill in add-course structure research framework draft review; do
+  _link ~/.claude/commands/${skill}.md "$REPO_DIR/skills/${skill}/SKILL.md" "$skill"
 done
 
-# Symlink frameworks directory
-frameworks_link=~/.claude/consultant-ai/frameworks
-if [ -L "$frameworks_link" ]; then
-  rm "$frameworks_link"
-elif [ -d "$frameworks_link" ]; then
-  echo "Warning: ~/.claude/consultant-ai/frameworks already exists as a directory — skipping"
-else
-  ln -s "$REPO_DIR/frameworks" "$frameworks_link"
-  echo "  Linked: frameworks/"
-fi
+# Symlink frameworks reference directory
+_link ~/.claude/consultant-ai/frameworks "$REPO_DIR/reference/frameworks" "reference/frameworks"
 
 echo ""
 echo "Done. Restart Claude Code for skills to appear."

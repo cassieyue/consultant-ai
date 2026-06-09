@@ -174,9 +174,9 @@ flowchart TD
 
 ## Extending the plugin
 
-**Add a framework**: Create a new `.md` file in `frameworks/` following the existing template structure (when to use, dimensions, data to collect, output format, common mistakes). Add an entry to `frameworks/index.md`.
+**Add a framework**: Create a new `.md` file in `reference/frameworks/` following the existing template structure (when to use, dimensions, data to collect, output format, common mistakes). Add an entry to `reference/frameworks/index.md`.
 
-**Modify a skill**: Edit the relevant file in `commands/`. Changes take effect immediately — no restart needed.
+**Modify a skill**: Edit the relevant `skills/[name]/SKILL.md` file. Changes take effect immediately — no restart needed.
 
 **Add a course**: Run `/add-course` — course context is stored in `~/.claude/memory/consultant-ai-courses.md`.
 
@@ -186,21 +186,29 @@ flowchart TD
 
 ```
 consultant-ai/
-├── commands/          # Claude Code skills (symlinked to ~/.claude/commands/)
-│   ├── consult.md
-│   ├── add-course.md
-│   ├── framework.md
-│   ├── structure.md
-│   ├── research.md
-│   ├── draft.md
-│   └── review.md
-├── frameworks/        # Framework application templates (symlinked to ~/.claude/consultant-ai/frameworks/)
-│   ├── index.md
-│   ├── pestel.md
-│   ├── hofstede.md
-│   └── ...
-├── examples/          # Example briefs and outputs — local only, not tracked
-├── setup.sh           # Symlink installer
+├── .claude-plugin/
+│   └── plugin.json        # Plugin manifest
+├── SKILL.md               # Root orchestrator (/consult) — symlinked to ~/.claude/commands/consult.md
+├── skills/                # Individual skills — each symlinked to ~/.claude/commands/
+│   ├── add-course/SKILL.md
+│   ├── structure/SKILL.md
+│   ├── research/SKILL.md
+│   ├── framework/SKILL.md
+│   ├── draft/SKILL.md
+│   └── review/SKILL.md
+├── agents/
+│   └── shared-rules.md    # Cross-cutting consultant standards for spawned agents
+├── reference/
+│   └── frameworks/        # Framework application templates (symlinked to ~/.claude/consultant-ai/frameworks/)
+│       ├── index.md
+│       ├── pestel.md
+│       ├── hofstede.md
+│       └── ...
+├── templates/             # Output format templates (slides, report, memo)
+├── docs/
+│   └── PRD.md
+├── examples/              # Example briefs and outputs — local only, not tracked
+├── setup.sh               # Symlink installer
 ├── .gitignore
 └── README.md
 ```

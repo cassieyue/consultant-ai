@@ -1,0 +1,8 @@
+{
+  "name": "consultant-ai",
+  "description": "A Claude Code plugin for business research and case analysis. Applies top-tier consulting methodology — MECE, Pyramid Principle, hypothesis-driven — across any business domain. Supports academic assignments, framework learning, and professional consulting work.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Cassia Yue"
+  }
+}
