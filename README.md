@@ -144,18 +144,30 @@ The plugin adapts its behavior based on the project context:
 
 ## Typical workflow
 
-```
-/add-course  →  register your course and frameworks
+```mermaid
+flowchart TD
+    Setup["/add-course\nRegister current courses and frameworks\nRun once per course — optional but recommended"]
+    Setup -.->|informs framework selection| C
 
-/consult     →  paste brief, get full analysis and draft
+    A([New project]) --> C{Choose approach}
 
-               or, step by step:
+    C -->|Fully automated| D["/consult\nPaste your brief"]
+    C -->|Step by step| E["/structure\nBuild MECE issue tree\nand initial hypothesis"]
 
-/structure   →  frame the problem as a MECE issue tree
-/research    →  research each branch (parallel agents)
-/framework   →  apply specific frameworks to findings
-/draft       →  produce the deliverable
-/review      →  QA before submission
+    D --> D1[Decode brief\ndomain · deliverable · criteria]
+    D1 --> D2[Select frameworks\ncourse-prioritized]
+    D2 --> D3[Parallel research agents\none per issue tree branch]
+    D3 --> D4[Synthesize findings\nPyramid Principle]
+    D4 --> F
+
+    E --> E1["/research\nParallel agents per branch"]
+    E1 --> E2["/framework\nApply frameworks to findings"]
+    E2 --> F
+
+    F["/draft\nSlides · Report · Memo"]
+    F --> G["/review\nReadiness score + specific fixes"]
+    G -->|Needs revision| F
+    G -->|Ready| H([Submit])
 ```
 
 ---
