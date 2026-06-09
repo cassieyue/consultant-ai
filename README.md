@@ -115,6 +115,21 @@ Senior partner QA review. Checks structure (MECE, Pyramid Principle), content qu
 
 ---
 
+### `/publish [output path]`
+Compiles all analysis, research findings, and framework outputs from the session into a self-contained HTML report and writes it to disk. The file opens in any browser with no dependencies — all CSS is inline, no external stylesheets or JavaScript required.
+
+The report includes a cover page, linked table of contents, executive summary, all analysis sections with inline citations, the final recommendation, and a complete alphabetically-sorted works cited list.
+
+```
+/publish
+/publish ~/Documents/mauritius-market-entry.html
+/publish ~/Desktop/supply-chain-analysis.html
+```
+
+Open the file after generation with `open [path]` or drag it into any browser.
+
+---
+
 ## Framework Library
 
 15 application templates covering all major business domains. Each template specifies what data to collect, how to structure the analysis, and what the "so what" insight should look like.
@@ -195,7 +210,8 @@ consultant-ai/
 │   ├── research/SKILL.md
 │   ├── framework/SKILL.md
 │   ├── draft/SKILL.md
-│   └── review/SKILL.md
+│   ├── review/SKILL.md
+│   └── publish/SKILL.md
 ├── agents/
 │   └── shared-rules.md    # Cross-cutting consultant standards for spawned agents
 ├── reference/
