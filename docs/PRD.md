@@ -315,13 +315,141 @@ The course context is intentionally stored in Claude's memory system (not the re
 
 ---
 
-## 11. Future Opportunities
+## 11. Gap Analysis
 
-| Opportunity | Description | Complexity |
-|---|---|---|
-| Formatted output export | Generate `.pptx`, `.docx`, or `.pdf` from draft content via MCP server | High |
-| Project persistence | Save research, outlines, and drafts across sessions automatically | Medium |
-| Expanded framework library | Add: DuPont, DCF, Make-vs-Buy, Value Chain, 4Ps, SWOT, Blue Ocean, Balanced Scorecard, and IS frameworks | Low |
-| Quantitative analysis | Integrate with data tools for financial modeling, market sizing calculations | High |
-| Citation management | Auto-format references in APA, Harvard, Chicago styles | Medium |
-| Competitor / company lookup | Structured company and market data via a financial data API | High |
+A structured review of missing capabilities across all dimensions of the plugin. Each gap is rated by complexity (Low / Medium / High) and impact (High / Medium).
+
+---
+
+### 11.1 Output & Delivery
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No file output** — draft content is text only, user must copy-paste into Google Slides, Word, etc. | Breaks flow; formatting is lost in translation; adds 30+ minutes of manual work per project | High (MCP + library like `python-pptx` or Pandoc) | High |
+| **No HTML export** — an intermediate `/draft html` could write a self-contained file to disk, printable to PDF from the browser | Solves 70% of the file output problem with Low complexity; no MCP server needed | Low (`Write` tool to `/outputs/` directory) | High |
+| **No Markdown tables for quantitative frameworks** — ratio analysis, Porter's force ratings, BCG positioning are described in prose instead of rendered as tables | Tables are standard in consulting deliverables; prose versions are harder to read and weaker analytically | Low (prompt update) | Medium |
+| **No citation file export** — references accumulate in chat but are never written to a `.md` or `.txt` file | Students need a clean, copyable reference list; manual extraction is error-prone | Low (`/draft references` command + `Write` tool) | High |
+
+---
+
+### 11.2 Project Management & Session Persistence
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No project state saved between sessions** — issue tree, research findings, framework outputs, and drafts are lost when Claude Code closes | Projects span days or weeks; students cannot pick up where they left off without re-running everything | Medium (`/save` and `/load` commands writing to a project file) | High |
+| **No `/status` command** — no way to see which branches have been researched, which frameworks applied, whether a draft exists | Users lose track of progress on multi-day projects; no checklist or completion view | Low/Medium (requires project state persistence) | High |
+| **No multi-project support** — course context is global; a student with 3 concurrent assignments has no way to context-switch cleanly | Business students routinely run 3–5 assignments in parallel across different courses | Medium (namespaced project files + `/project new/list/switch`) | Medium |
+| **No deadline or constraint persistence** — word count, slide limit, and submission deadline are extracted but not saved | Users must re-state constraints each session; academic format errors are a direct mark loss | Low (structured constraints block in project state file) | Medium |
+
+---
+
+### 11.3 Research Quality
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No contradiction detection** — parallel agents can return conflicting figures from different sources with no flag | Conflicting GDP figures or market sizes passed to synthesis create inaccurate analysis | Low (prompt update to synthesis step) | Medium |
+| **No source recency validation** — no check that data is within an acceptable date range for time-sensitive claims | Outdated statistics in academic or professional work undermine credibility | Low (prompt update) | Medium |
+| **No access to paywalled academic databases** — WebSearch returns open-web results; institutional databases (JSTOR, EBSCO, ProQuest) are inaccessible | Academic mode requires journal citations; web search may not surface sufficient tier-1a sources | High (browser automation or library API) | Medium |
+| **No structured company financial data source** — `/framework ratio-analysis` requires the user to supply the numbers | Applying ratio analysis without actual financials is a framework template, not analysis | High (API); Medium (agents scraping annual reports and IR pages) | High |
+| **No primary research scaffolding** — plugin handles secondary research only; no interview guides, survey templates, or qualitative synthesis | Professional consulting frequently requires primary research; some academic cases do too | Medium (new `/research-guide` skill) | Medium |
+
+---
+
+### 11.4 Framework Coverage
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **Frameworks listed in `index.md` but missing template files** — SWOT, Value Chain, 4Ps, DuPont, DCF, Blue Ocean, Make-vs-Buy, TCO, BCG (partial), Balanced Scorecard, Customer Journey, Business Model Canvas, and IS frameworks have no `.md` file | `/framework swot` falls back to generic Claude knowledge instead of a calibrated application guide; inconsistent quality | Low (each template ~1 hour to write) | High |
+| **No framework combination guidance** — when PESTEL feeds Porter's Five Forces, or VRIO informs Modes of Entry, there is no guidance on connecting their outputs | Students apply frameworks in silos, producing disconnected sections rather than integrated analysis | Low (add "when to combine" section to templates + prompt in `/consult`) | Medium |
+| **Missing frameworks for common domains** — Balanced Scorecard, Stakeholder Analysis, Business Model Canvas, DMAIC/Lean Six Sigma, CVP analysis, Risk Matrix, RACI | Standard in MBA curricula; encountering them falls back to generic Claude knowledge | Low per framework | Medium |
+
+---
+
+### 11.5 User Workflow
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No iterative issue tree revision** — if research overturns the hypothesis, there is no `/structure update` flow | Consulting is iterative; the current flow treats the issue tree as immutable | Low (prompt update to `/structure`) | Medium |
+| **No `/compare` command** — after applying two frameworks to the same problem, there is no synthesis of where they agree or conflict | Students produce adjacent frameworks instead of integrated analysis; this is the most common quality gap in academic work | Low (new skill reading previous outputs) | Medium |
+| **No PDF brief parsing** — `/consult` mentions file upload but does not explicitly instruct itself to read a PDF; no dedicated `/brief` skill | Most academic assignments are delivered as PDFs; auto-parsing eliminates manual re-typing of criteria | Low (Read tool handles PDFs; prompt fix) | High |
+| **No `/help` command** — new users must exit to the README to find command syntax | Plugin discoverability drops without in-context help | Low (static markdown skill) | Medium |
+| **`/draft` requires manual context supply** — user must paste previous research and framework outputs if they used step-by-step skills | Significant friction after a manual workflow; breaks the step-by-step path | Medium (requires session state persistence) | High |
+| **No word/slide count enforcement** — `/draft` mentions constraints but does not flag when output exceeds them | Academic submissions have hard limits; over-length drafts require manual cutting | Low (prompt update) | Medium |
+
+---
+
+### 11.6 Academic Use Case
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No citation style enforcement** — the plugin flags that style should match the course requirement but does not actively format citations | Citation formatting is directly marked in most business school courses | Low (`/add-course` captures style; `/draft` and `/research` apply it) | High |
+| **Rubric not parsed from PDF** — marking criteria are only extracted if the user pastes them; rubric tables in PDF briefs are not auto-read | Misinterpreting a 30% criterion vs. a 10% one is a significant quality risk | Low (prompt fix to read attached PDF and extract rubric table) | High |
+| **`/review` not weighted by rubric** — the review checklist is fixed regardless of the actual marking criteria percentages | A 7/10 score means nothing without knowing whether the highest-weighted criterion was addressed proportionally | Medium (review skill must weight its assessment against actual rubric weights) | High |
+| **No learning scaffolding for exam prep** — learning mode explains framework application but does not support studying: no summaries, no framework comparisons, no practice questions | Students use the tool not just for assignments but to study; exam prep is a high-value adjacent use case | Low/Medium (new `/learn` skill or mode extension) | Medium |
+
+---
+
+### 11.7 Professional Use Case
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No client context system** — professional mode has no concept of a named client with persistent context (industry, risk tolerance, preferences) | Every session starts from scratch; a real engagement spans weeks and accumulates context | Medium (new `/client` command analogous to `/add-course`) | Medium |
+| **No `/competitor` skill** — no structured way to profile a competitor (financials, strategy, products, leadership, recent moves) | Competitor profiling is one of the most common early consulting tasks | Low/Medium (parallel agent set per topic area) | High |
+| **No market sizing skill** — TAM/SAM/SOM and bottom-up sizing models are referenced but not computable | Telling a client "the market is approximately $X" without a defensible model is not consulting | Medium (new `/size [market]` skill with structured top-down arithmetic) | High |
+| **No quantitative modeling** — break-even, scenario modeling, sensitivity analysis, DCF cannot be computed | Professional consulting work always involves numbers; the plugin can structure but not calculate | High (requires computational tools or MCP) | High |
+| **Limited deliverable formats** — only slides, report, and memo; missing board briefings, status updates, steering committee decks, Issue-Action logs | Interns and analysts on real engagements need these formats | Low (additional format options in `/draft`) | Medium |
+
+---
+
+### 11.8 Platform & Integration
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No Google Slides / PowerPoint export** — most common destination for slide output | Manually creating 10+ slides from terminal output takes 30+ minutes | High (Google Slides API or `python-pptx` via MCP) | High |
+| **No Notion / Google Docs export for reports** — work product stays in the terminal | Students and professionals organize work in collaborative documents, not CLI output | High for real integration; Low for Markdown-to-file output (importable by both) | High |
+| **Symlink-based install is high friction** — `git clone`, `chmod +x`, `./setup.sh`, understanding symlinks | Target users are business students and consultants, not developers; drop-off risk is high | Medium (one-line install script, better error messages, a sanity-check command) | High |
+| **Single-machine, no sync** — course context and project files live on one machine only | A student on two devices has two separate plugin instances with no shared state | Medium (use cloud-synced folder for `~/.claude/consultant-ai/`) | Medium |
+
+---
+
+### 11.9 Collaboration
+
+| Gap | Why it matters | Complexity | Impact |
+|---|---|---|---|
+| **No export for sharing** — work produced in a session cannot be shared with teammates or professors in any structured way | Group assignments are extremely common in business school; only one person can use the plugin | Low (`/export` command producing a clean shareable `.md` file) | High |
+| **No `/brief-reviewer` skill** — no way to generate a structured summary to guide a professor or senior colleague's feedback | Getting useful feedback requires directing attention; this is itself a consulting skill | Low (new skill producing a 1-page reviewer brief) | Medium |
+| **No group contribution tracking** — no ownership of issue tree branches by team member | Group coordination is one of the most painful parts of academic consulting projects | Low (RACI-style ownership in project state file) | Low |
+
+---
+
+## 12. Future Opportunities (Prioritized)
+
+Gaps ranked by impact and feasibility for near-term implementation.
+
+### Near-term (Low complexity, High impact)
+1. **Expand framework templates** — write missing `.md` files for SWOT, Value Chain, 4Ps, DuPont, DCF, Blue Ocean, Make-vs-Buy, Business Model Canvas, Balanced Scorecard
+2. **HTML file output** — `/draft html` writes a self-contained file to disk; printable to PDF from browser
+3. **Citation style enforcement** — capture style in `/add-course`, apply in `/draft` and `/research`
+4. **PDF brief parsing** — fix `/consult` to explicitly read an attached PDF and extract brief + rubric
+5. **Citation file export** — `/draft references` writes a formatted reference list to disk
+6. **Word/slide count enforcement** — flag when output exceeds stated constraints
+7. **`/help` command** — in-context command reference
+8. **Contradiction detection in research** — prompt update to synthesis step in `/research`
+9. **`/compare` command** — integrate two framework outputs into a single synthesis
+10. **`/brief-reviewer` skill** — structured 1-page reviewer brief for professors or supervisors
+
+### Medium-term (Medium complexity, High impact)
+11. **Project state save/load** — `/save` and `/load` commands writing to a named project file
+12. **`/status` command** — shows phase completion, research coverage, review score
+13. **Rubric-weighted `/review`** — assessment weighted by actual marking criteria percentages
+14. **`/competitor` skill** — structured competitor profile using parallel research agents
+15. **Market sizing skill** — `/size [market]` with top-down arithmetic and sourced assumptions
+16. **Multi-project support** — namespaced project files, `/project` command set
+17. **Client context system** — `/client` command for professional mode, analogous to `/add-course`
+18. **Framework combination guidance** — "when to combine" sections + synthesis prompt in `/consult`
+
+### Long-term (High complexity, High impact)
+19. **Formatted file generation** — `.pptx` and `.docx` export via MCP server
+20. **Quantitative modeling** — break-even, scenario, sensitivity, DCF via computational tools
+21. **Google Slides / Notion integration** — direct export to collaborative tools
+22. **Paywalled database access** — institutional library API or browser automation for journal retrieval
