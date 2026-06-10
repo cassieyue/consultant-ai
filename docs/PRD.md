@@ -1,7 +1,7 @@
 # Product Requirements Document
 # Consultant AI — Claude Code Plugin
 
-**Version**: 1.1  
+**Version**: 1.5  
 **Status**: Active  
 **Last updated**: 2026-06-09
 
@@ -27,7 +27,7 @@ Produce consultant-quality business analysis — McKinsey, BCG, Deloitte standar
 - Enable parallel research that would otherwise be done sequentially
 
 ### Non-goals
-- Generate formatted output files (PowerPoint, PDF, Word) — out of scope for v1
+- Generate PPTX or native document formats (PowerPoint, Word) — v2.0 item; HTML export is available via `/publish`
 - Replace a student's own thinking — the plugin structures and accelerates, it does not substitute judgment
 - Primary research (interviews, surveys) — plugin handles secondary research only
 - Real-time collaboration or multi-user features
@@ -76,11 +76,11 @@ The plugin operates in three modes, detected automatically from the brief and ad
 **Inputs**: Business brief (pasted text, uploaded file, or verbal description)
 
 **Process**:
-1. Load course context from memory
+1. **Load context**: read active project file (if any) and offer Continue / Start new; scan run log for prior work on the same company or market; load course context; load client context in professional mode and note risk tolerance, stakeholders, and constraints
 2. Decode brief: domain, mode, deliverable format, constraints, marking criteria
 3. Confirm reading with user
 4. Build MECE issue tree and state initial hypothesis
-5. Select frameworks (course-prioritized)
+5. **Select framework sequence**: read `index.md`; recommend a numbered 2–4 framework chain (not a flat list) where the output of each framework feeds the next; use "Combines with" guidance in templates; flag course-registered frameworks as priority
 6. **Confirmation gate**: show research plan (sub-questions, agent count, estimated time); offer Full research / Quick draft / Edit scope
 7. Spawn parallel research agents — one per issue tree branch
 8. **Error recovery**: if agents fail partially, surface which sub-questions are missing and ask retry / continue / abort; do not synthesize with fewer than 2 usable findings
@@ -100,22 +100,24 @@ The plugin operates in three modes, detected automatically from the brief and ad
 - Synthesis cites only HIGH/MEDIUM claims; DISPUTED/UNVERIFIED appear in Caveats
 - Draft follows Pyramid Principle: answer first, arguments, evidence
 - In academic mode: every marking criterion is explicitly addressed
+- In professional mode: client risk tolerance and stakeholder priorities are reflected in recommendation framing
 
 ---
 
 ### 5.2 `/add-course` — Course context registration
 **What it does**: Registers a course and its frameworks so the plugin can prioritize them in future sessions.
 
-**Inputs**: Course name, topics, frameworks being studied, professor-specific notes (optional)
+**Inputs**: Course name, topics, frameworks being studied, citation style (Harvard / APA 7th / Chicago / MLA 9th), professor-specific notes (optional)
 
 **Process**: Appends course entry to `~/.claude/memory/consultant-ai-courses.md`
 
-**Output**: Confirmation of what was saved; explanation of how it affects `/consult` and `/framework`
+**Output**: Confirmation of what was saved including citation style; explanation of how it affects `/consult`, `/framework`, `/research`, `/draft`, and `/publish`
 
 **Acceptance criteria**:
 - Adds entry without overwriting existing courses
-- Stored in structured, human-readable format
+- Stored in structured, human-readable format with `Citation style:` field
 - Course context is loaded and applied correctly in subsequent `/consult` and `/framework` invocations
+- Registered citation style is applied by `/research` step 6, `/draft` step 2, and `/publish` step 3 — defaults to Harvard if none registered
 
 ---
 
@@ -193,7 +195,7 @@ The plugin operates in three modes, detected automatically from the brief and ad
 ### 5.6 `/draft` — Deliverable production
 **What it does**: Produces polished, consultant-quality output in the required format.
 
-**Inputs**: Section name or "full"; deliverable format (slides, report, memo)
+**Inputs**: Section name or "full"; deliverable format (slides, report, memo, board brief, issue-action log)
 
 **Format behaviors**:
 
@@ -203,31 +205,40 @@ The plugin operates in three modes, detected automatically from the brief and ad
 
 *Memo*: Situation → Complication → Question → Answer. 1–3 pages. Decision-maker focused.
 
+*Board brief*: Reads `templates/board-brief.md`. Strict 1-page: Situation (2–3 sentences) → Decision Required (1 sentence) → Recommendation + 3 evidence bullets → Financial Impact table (investment / return / payback) → Top Risks (2–3 + mitigation) → The Ask (checkboxes). Lead with the decision not the background; one recommendation, never options.
+
+*Issue-action log*: Reads `templates/issue-action-log.md`. Table tracker: Issue/Action | Owner (one named person) | Action Required (specific verb phrase) | Deadline (specific date) | Status. Extracts from /review critical issues, /critique fixes, and pending research branches.
+
+**Word and slide count enforcement**: After generating full output, estimates word count (written formats) or slide count and compares against any stated constraint. If over: names the longest sections and suggests specific cuts. Reports count regardless.
+
 **Acceptance criteria**:
 - No slide header is a label — every header contains a claim
 - No vague assertions — all data points are specific and attributed
 - Active voice throughout
-- In academic mode: marking criteria mapped to sections; citation format matches course requirements
+- In academic mode: marking criteria mapped to sections; citation style applied from course context (defaults to Harvard if none registered)
 - No filler phrases ("it can be argued that", "in conclusion", "there are many factors")
+- Word/slide count always reported; over-limit drafts include specific cut suggestions
 
 ---
 
 ### 5.7 `/review` — Quality review
 **What it does**: Senior partner QA of completed work before submission.
 
-**Checks**:
+**Process**:
+- **Step 0** (academic mode): read marking criteria and weights; build a weighting table; determine score caps: criterion ≥40% weight + Critical Issue → max 5/10; ≥30% → max 6/10; ≥20% → max 7/10; criterion ≥15% weight + Important Issue → max 8/10
 - Structure: MECE, Pyramid Principle, central question answered
 - Content: claims supported, data specific, frameworks correctly applied, clear recommendation
 - Sources: authority level appropriate, citations complete
 - Academic compliance: criteria coverage, weighting, format requirements
 - Consulting writing: insight headers, active voice, no hedging, specific recommendation
 
-**Output**: Readiness score (1–10), critical issues, important issues, minor issues, what it takes to reach 10/10
+**Output**: Weight-adjusted readiness score (1–10) with the binding constraint stated ("Score capped at 6/10 — 30% criterion [name] has a critical issue"), critical issues, important issues, minor issues, what it takes to reach 10/10
 
 **Acceptance criteria**:
 - Every finding references a specific part of the work
 - Distinguishes critical (must fix) from minor (nice to fix)
 - Provides actionable fix for each issue, not just identification
+- In academic mode: score cap logic applied; binding constraint explicitly named
 
 ---
 
@@ -319,7 +330,161 @@ The plugin operates in three modes, detected automatically from the brief and ad
 
 ---
 
+### 5.12 `/compare` — Framework synthesis
+**What it does**: Synthesizes two framework outputs from the session into a combined implication.
+
+**Inputs**: Two framework names as arguments (e.g. `/compare pestel hofstede`)
+
+**Process**:
+1. Parse argument to identify the two frameworks
+2. Retrieve both outputs from session context
+3. Map agreement (where both point the same direction) and conflicts (where they contradict); for each conflict resolve with a verdict — which finding to weight more heavily and why
+4. Produce a single combined implication for the central question
+
+**Output**: Agreement block, Conflicts block (with resolution verdicts), Open Questions block, Combined Implication (1–2 sentences)
+
+**Acceptance criteria**:
+- Conflicts are resolved with a reasoned recommendation, not both sides presented equally
+- Combined implication is a single actionable sentence addressing the central question
+- Does not restate framework outputs — synthesizes them
+
+---
+
+### 5.13 `/help` — Skill reference
+**What it does**: Prints a complete, scannable reference of every skill with syntax and examples, grouped by workflow stage.
+
+**Output**: Static formatted reference (Setup → Decode → Structure → Research → Orchestrate → Draft → Quality Assurance → Output → Professional Mode → Project Management). Includes three workflow paths (fully automated, step by step, resume saved project).
+
+**Acceptance criteria**:
+- Every skill listed with syntax and at least one example invocation
+- Scannable in under 30 seconds
+- No external lookups — output is purely static content from the skill file
+
+---
+
+### 5.14 `/save` — Project state persistence
+**What it does**: Saves all current session artifacts to a named project file.
+
+**Inputs**: Project name (prompts if not provided)
+
+**Process**: Collects central question, hypothesis, mode, constraints, marking criteria, issue tree, research findings with confidence scores, framework outputs (one-line summaries), draft status by section, review score, and critique verdict. Writes to `~/.claude/projects/consultant-ai/[name].md`. Appends one-line entry to `~/.claude/memory/consultant-ai-run-log.md`. Prunes run log entries older than 6 months.
+
+**Output**: Confirmation checklist showing what was saved and the project file path
+
+**Acceptance criteria**:
+- Produces a complete, human-readable project file
+- Appends to run log without overwriting prior entries
+- Confirms the path and what was captured
+
+---
+
+### 5.15 `/load` — Project restore
+**What it does**: Loads a saved project file and restores context into the working session.
+
+**Inputs**: Project name (shows list if not provided)
+
+**Process**: Reads the project file; presents a structured summary of restored context (central question, mode, completed phases, outstanding phases); recommends one next step; sets the project as active in `~/.claude/memory/consultant-ai-active-project.md`
+
+**Output**: Restored context summary + recommended next command
+
+**Acceptance criteria**:
+- Correctly restores all saved fields
+- "Next step" recommendation is the first incomplete phase in the workflow
+- Active project pointer updated so `/consult` picks it up on next invocation
+
+---
+
+### 5.16 `/status` — Project completion checklist
+**What it does**: Shows the current project's completion state at a glance.
+
+**Output**: Checklist (✓ / ◐ / ○) for: brief decoded, issue tree built, research complete (per branch), frameworks applied, /compare run, draft complete (per section), /review run, /critique run, /publish run, /references run, /save run. Word/slide count vs. stated limit. Single next-step command.
+
+**Acceptance criteria**:
+- Fits on one screen
+- Each incomplete item shows the command to run next
+- Reports constraint status: "1,847 / 2,000 words" or "12 / 15 slides"
+
+---
+
+### 5.17 `/project` — Project management
+**What it does**: Manages named project files — create, list, switch, delete.
+
+**Inputs**: Command + name: `new [name]`, `list`, `switch [name]`, `delete [name]`
+
+**Process**:
+- `new`: creates blank project file, sets as active, confirms
+- `list`: shows all project files with last-updated date and brief description
+- `switch`: updates active project pointer, shows what context changed
+- `delete`: AskUserQuestion confirmation gate before deleting
+
+**Acceptance criteria**:
+- `delete` always asks for confirmation before removing anything
+- `list` output is scannable (one line per project)
+- `switch` confirms which project is now active
+
+---
+
+### 5.18 `/competitor` — Competitor profiling
+**What it does**: Builds a one-page competitor profile using parallel research agents.
+
+**Inputs**: Company name and optional context (e.g. `/competitor BYD — Nigeria market entry`)
+
+**Process**:
+1. Confirmation gate: show what will be researched, estimated time, approve before spawning
+2. Spawn 5 parallel agents covering: financials and recent results, products and positioning, strategy and recent moves, leadership and org, known weaknesses and vulnerabilities
+3. Error recovery: if fewer than 3 agents return usable output, ask Retry / Continue / Abort
+4. 5 Advisors validation: Contrarian + First Principles on key claims
+5. Synthesize into a one-page profile + THREAT ASSESSMENT paragraph (2–3 specific sentences, not a list)
+
+**Output**: Structured profile with confidence tiers on key facts + threat assessment
+
+**Acceptance criteria**:
+- Confirmation gate fires before agents spawn
+- Every claim has a source and confidence tier
+- Threat assessment is 2–3 sentences — not a bullet list — stating a specific, reasoned judgement
+
+---
+
+### 5.19 `/size` — Market sizing
+**What it does**: Builds a defensible market sizing model with top-down and bottom-up methods.
+
+**Inputs**: Market description (e.g. `/size electric vehicles in Nigeria`)
+
+**Process**:
+1. Confirm market definition before building the model
+2. Top-down: TAM (total population × penetration rate × average spend) → SAM (serviceable segment) → SOM (realistic capture)
+3. Bottom-up cross-check: unit economics × addressable customers
+4. Divergence check: if top-down and bottom-up figures diverge >2×, explain why
+5. Sensitivity table: pessimistic / base / optimistic scenarios with key assumption varied
+6. Conclude with a specific addressable revenue range
+
+**Acceptance criteria**:
+- Every assumption is sourced or explicitly flagged as a reasoned estimate
+- Top-down and bottom-up figures both shown; divergence >2× explained
+- Sensitivity table with at least 3 scenarios
+- Concludes with a specific number range, not a vague "market is large"
+
+---
+
+### 5.20 `/client` — Client context registration
+**What it does**: Registers a professional client's context for use in professional-mode sessions.
+
+**Inputs**: Client name (guided intake follows)
+
+**Process**: Guided intake collecting: client name, industry, engagement type, risk tolerance (Conservative / Balanced / Aggressive), key stakeholders, key constraints, engagement history notes. Saves to `~/.claude/memory/consultant-ai-clients.md`.
+
+**Output**: Confirmation of what was saved; summary of how it will affect `/consult` in professional mode
+
+**Acceptance criteria**:
+- Multiple clients can be registered without overwriting others
+- `/consult` reads client context in Step 1 when mode is Professional and uses risk tolerance to calibrate tone, certainty level, and risk framing
+- Risk tolerance (Conservative / Balanced / Aggressive) affects how prominently risks are surfaced in the recommendation
+
+---
+
 ## 6. Framework Library
+
+28 templates across all major business domains. Each template is structured identically: When to use → Components with what data to find → Output structure (table-first, prose follows) → Common mistakes → Combines with.
 
 ### v1 frameworks (15 templates)
 
@@ -339,16 +504,31 @@ The plugin operates in three modes, detected automatically from the brief and ad
 | SCOR Model | `scor.md` | Supply Chain |
 | MECE Structuring | `mece.md` | Consulting Method |
 | Pyramid Principle | `pyramid-principle.md` | Consulting Method |
+| Marketing Mix (4Ps/7Ps) | `marketing-mix.md` | Marketing |
 
-### Each template includes
-- When to use this framework
-- What data to collect per dimension
-- How to structure the analysis
-- What the "so what" insight should look like
-- Common mistakes to avoid
+### v1.3 frameworks (13 new templates)
+
+| Framework | File | Domain |
+|---|---|---|
+| SWOT Analysis | `swot.md` | Strategy |
+| Value Chain Analysis | `value-chain.md` | Strategy |
+| Business Model Canvas | `business-model-canvas.md` | Strategy |
+| Stakeholder Analysis | `stakeholder-analysis.md` | Any domain |
+| Balanced Scorecard | `balanced-scorecard.md` | Strategy, Finance |
+| Blue Ocean Strategy | `blue-ocean.md` | Strategy |
+| Make-vs-Buy Analysis | `make-vs-buy.md` | Supply Chain, Operations |
+| DuPont Analysis | `dupont.md` | Finance |
+| CVP / Break-even Analysis | `cvp-breakeven.md` | Finance |
+| DCF Valuation | `dcf.md` | Finance |
+| DMAIC / Lean Six Sigma | `dmaic.md` | Operations |
+| Risk Matrix | `risk-matrix.md` | Any domain |
+
+### Framework combinations
+
+Every template includes a "Combines with" section listing 3 frameworks to run next, what output to pass, and why. `reference/frameworks/index.md` contains a "Recommended framework sequences by brief type" section with 8 pre-built chains (market entry, competitive strategy, marketing strategy, operational improvement, financial analysis, change management, new market segment, and supply chain optimization).
 
 ### Adding frameworks
-Create a `.md` file in `frameworks/` following the template structure above. Add an entry to `frameworks/index.md` under the appropriate domain.
+Create a `.md` file in `reference/frameworks/` following the standard template structure. Add an entry to `reference/frameworks/index.md` under the appropriate domain.
 
 ---
 
@@ -372,12 +552,16 @@ The course context is intentionally stored in Claude's memory system (not the re
 | Component | Location | Purpose |
 |---|---|---|
 | Root orchestrator | `SKILL.md` → symlinked to `~/.claude/commands/consult.md` | `/consult` — full end-to-end workflow |
-| Skills (slash commands) | `skills/[name]/SKILL.md` → symlinked to `~/.claude/commands/` | 10 individual skills: brief, add-course, structure, research, framework, draft, critique, review, publish, references |
+| Skills (slash commands) | `skills/[name]/SKILL.md` → symlinked to `~/.claude/commands/` | 19 individual skills: brief, add-course, structure, research, framework, draft, critique, review, publish, references, compare, help, save, load, status, project, competitor, size, client |
 | Shared agent rules | `agents/shared-rules.md` | Cross-cutting consultant standards applied by all spawned agents |
-| Framework templates | `reference/frameworks/*.md` → symlinked to `~/.claude/consultant-ai/frameworks/` | Application guides read by the `/framework` skill |
-| Framework index | `reference/frameworks/index.md` | Maps domains to frameworks; read by `/consult` and `/structure` |
-| Output templates | `templates/slides.md`, `report.md`, `memo.md` | Format guides read by `/draft` |
+| Framework templates | `reference/frameworks/*.md` → symlinked to `~/.claude/consultant-ai/frameworks/` | 28 application guides read by the `/framework` skill |
+| Framework index | `reference/frameworks/index.md` | Maps domains to frameworks; contains framework combination sequences; read by `/consult` and `/structure` |
+| Output templates | `templates/slides.md`, `report.md`, `memo.md`, `board-brief.md`, `issue-action-log.md` | Format guides read by `/draft` |
 | Course context | `~/.claude/memory/consultant-ai-courses.md` | User-specific, not tracked in repo |
+| Client context | `~/.claude/memory/consultant-ai-clients.md` | Professional mode client profiles, not tracked in repo |
+| Project files | `~/.claude/projects/consultant-ai/[name].md` | Saved project state, not tracked in repo |
+| Active project pointer | `~/.claude/memory/consultant-ai-active-project.md` | One-line file tracking current project name |
+| Run log | `~/.claude/memory/consultant-ai-run-log.md` | One line per completed project; pruned at >6 months |
 | Setup script | `setup.sh` | Creates all symlinks on installation |
 
 ### Design decisions
@@ -404,13 +588,14 @@ The course context is intentionally stored in Claude's memory system (not the re
 
 ---
 
-## 10. Limitations (v1.1)
+## 10. Limitations (v1.5)
 
-- **No native formatted file output**: Does not generate PowerPoint, PDF, or Word files. `/publish` produces a self-contained HTML report printable to PDF from any browser; user must manually format slides.
+- **No native slide or document file output**: Does not generate PowerPoint or Word files. `/publish` produces a self-contained HTML report printable to PDF from any browser; PPTX export is a v2.0 item.
 - **Secondary research only**: Uses web search for published sources. Cannot conduct interviews, surveys, or access paywalled databases (JSTOR, EBSCO, ProQuest).
 - **Single user**: No collaboration, sharing, or multi-user state.
-- **No persistent project memory across sessions**: Research, findings, and drafts are not automatically saved between Claude Code sessions. Use `/publish` and `/references` to write outputs to disk before closing a session.
-- **Framework library is curated, not exhaustive**: Templates cover the most common business school domains. Niche or advanced frameworks fall back to Claude's training knowledge without a calibrated application guide.
+- **Project memory is manual**: Research and findings are saved via `/save` and restored via `/load`. Session context is not auto-saved — run `/save` before closing a session to persist progress.
+- **Framework library is curated, not exhaustive**: 28 templates cover the most common business school domains. Niche or advanced frameworks fall back to Claude's training knowledge without a calibrated application guide.
+- **No quantitative computation**: Break-even, DCF, and sensitivity modeling use framework templates for structure but cannot compute numerical outputs — this is a v2.0 item requiring a computation MCP tool.
 
 ---
 
@@ -433,12 +618,12 @@ A structured review of missing capabilities across all dimensions of the plugin.
 
 ### 11.2 Project Management & Session Persistence
 
-| Gap | Why it matters | Complexity | Impact |
-|---|---|---|---|
-| **No project state saved between sessions** — issue tree, research findings, framework outputs, and drafts are lost when Claude Code closes | Projects span days or weeks; students cannot pick up where they left off without re-running everything | Medium (`/save` and `/load` commands writing to a project file) | High |
-| **No `/status` command** — no way to see which branches have been researched, which frameworks applied, whether a draft exists | Users lose track of progress on multi-day projects; no checklist or completion view | Low/Medium (requires project state persistence) | High |
-| **No multi-project support** — course context is global; a student with 3 concurrent assignments has no way to context-switch cleanly | Business students routinely run 3–5 assignments in parallel across different courses | Medium (namespaced project files + `/project new/list/switch`) | Medium |
-| **No deadline or constraint persistence** — word count, slide limit, and submission deadline are extracted but not saved | Users must re-state constraints each session; academic format errors are a direct mark loss | Low (structured constraints block in project state file) | Medium |
+| Gap | Why it matters | Complexity | Impact | Status |
+|---|---|---|---|---|
+| ~~**No project state saved between sessions**~~ | ~~Projects span days or weeks; students cannot pick up where they left off without re-running everything~~ | ~~Medium~~ | ~~High~~ | **Resolved** — `/save` writes a complete project file; `/load` restores context; active project tracked in `consultant-ai-active-project.md` |
+| ~~**No `/status` command**~~ | ~~Users lose track of progress on multi-day projects~~ | ~~Low/Medium~~ | ~~High~~ | **Resolved** — `/status` shows a ✓/◐/○ checklist for all phases with word/slide count vs. limit and a single next-step command |
+| ~~**No multi-project support**~~ | ~~A student with 3 concurrent assignments has no way to context-switch cleanly~~ | ~~Medium~~ | ~~Medium~~ | **Resolved** — `/project new/list/switch/delete` manages named project files; `/load` sets the active project |
+| ~~**No deadline or constraint persistence**~~ | ~~Users must re-state constraints each session; academic format errors are a direct mark loss~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — constraints saved in project file by `/save` and restored by `/load` |
 
 ---
 
@@ -456,11 +641,11 @@ A structured review of missing capabilities across all dimensions of the plugin.
 
 ### 11.4 Framework Coverage
 
-| Gap | Why it matters | Complexity | Impact |
-|---|---|---|---|
-| **Frameworks listed in `index.md` but missing template files** — SWOT, Value Chain, 4Ps, DuPont, DCF, Blue Ocean, Make-vs-Buy, TCO, BCG (partial), Balanced Scorecard, Customer Journey, Business Model Canvas, and IS frameworks have no `.md` file | `/framework swot` falls back to generic Claude knowledge instead of a calibrated application guide; inconsistent quality | Low (each template ~1 hour to write) | High |
-| **No framework combination guidance** — when PESTEL feeds Porter's Five Forces, or VRIO informs Modes of Entry, there is no guidance on connecting their outputs | Students apply frameworks in silos, producing disconnected sections rather than integrated analysis | Low (add "when to combine" section to templates + prompt in `/consult`) | Medium |
-| **Missing frameworks for common domains** — Balanced Scorecard, Stakeholder Analysis, Business Model Canvas, DMAIC/Lean Six Sigma, CVP analysis, Risk Matrix, RACI | Standard in MBA curricula; encountering them falls back to generic Claude knowledge | Low per framework | Medium |
+| Gap | Why it matters | Complexity | Impact | Status |
+|---|---|---|---|---|
+| ~~**Frameworks listed in `index.md` but missing template files**~~ | ~~`/framework swot` falls back to generic Claude knowledge; inconsistent quality~~ | ~~Low~~ | ~~High~~ | **Resolved** — 13 new templates added (v1.3): SWOT, Marketing Mix, Value Chain, Business Model Canvas, Stakeholder Analysis, Balanced Scorecard, Blue Ocean, Make-vs-Buy, DuPont, CVP, DCF, DMAIC, Risk Matrix |
+| ~~**No framework combination guidance**~~ | ~~Students apply frameworks in silos, producing disconnected sections~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — every template has a "Combines with" section; `index.md` has 8 recommended framework sequences by brief type; `/consult` Step 4 recommends numbered chains |
+| ~~**Missing frameworks for common domains**~~ | ~~Standard MBA frameworks fall back to generic Claude knowledge~~ | ~~Low per framework~~ | ~~Medium~~ | **Resolved** — see above; 28 templates now cover all standard MBA domains |
 
 ---
 
@@ -469,34 +654,34 @@ A structured review of missing capabilities across all dimensions of the plugin.
 | Gap | Why it matters | Complexity | Impact | Status |
 |---|---|---|---|---|
 | **No iterative issue tree revision** — if research overturns the hypothesis, there is no `/structure update` flow | Consulting is iterative; the current flow treats the issue tree as immutable | Low (prompt update to `/structure`) | Medium | Open |
-| **No `/compare` command** — after applying two frameworks to the same problem, there is no synthesis of where they agree or conflict | Students produce adjacent frameworks instead of integrated analysis; this is the most common quality gap in academic work | Low (new skill reading previous outputs) | Medium | Open |
+| ~~**No `/compare` command**~~ | ~~Students produce adjacent frameworks instead of integrated analysis~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — `/compare [framework-a] [framework-b]` synthesizes outputs, resolves conflicts with verdicts, and produces a single combined implication |
 | ~~**No PDF brief parsing**~~ | ~~Most academic assignments are delivered as PDFs; auto-parsing eliminates manual re-typing of criteria~~ | ~~Low~~ | ~~High~~ | **Resolved** — `/brief` reads PDFs and text, extracts domain/mode/marking criteria/examiner intent/recommended frameworks |
-| **No `/help` command** — new users must exit to the README to find command syntax | Plugin discoverability drops without in-context help | Low (static markdown skill) | Medium | Open |
+| ~~**No `/help` command**~~ | ~~New users must exit to the README to find command syntax~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — `/help` prints a full skill reference grouped by workflow stage with syntax and examples |
 | **`/draft` requires manual context supply** — user must paste previous research and framework outputs if they used step-by-step skills | Significant friction after a manual workflow; breaks the step-by-step path | Medium (requires session state persistence) | High | Open |
-| **No word/slide count enforcement** — `/draft` mentions constraints but does not flag when output exceeds them | Academic submissions have hard limits; over-length drafts require manual cutting | Low (prompt update) | Medium | Open |
+| ~~**No word/slide count enforcement**~~ | ~~Academic submissions have hard limits; over-length drafts require manual cutting~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — `/draft` reports count after every generation; if over limit, names longest sections and suggests specific cuts |
 
 ---
 
 ### 11.6 Academic Use Case
 
-| Gap | Why it matters | Complexity | Impact |
-|---|---|---|---|
-| **No citation style enforcement** — the plugin flags that style should match the course requirement but does not actively format citations | Citation formatting is directly marked in most business school courses | Low (`/add-course` captures style; `/draft` and `/research` apply it) | High |
-| **Rubric not parsed from PDF** — marking criteria are only extracted if the user pastes them; rubric tables in PDF briefs are not auto-read | Misinterpreting a 30% criterion vs. a 10% one is a significant quality risk | Low (prompt fix to read attached PDF and extract rubric table) | High |
-| **`/review` not weighted by rubric** — the review checklist is fixed regardless of the actual marking criteria percentages | A 7/10 score means nothing without knowing whether the highest-weighted criterion was addressed proportionally | Medium (review skill must weight its assessment against actual rubric weights) | High |
-| **No learning scaffolding for exam prep** — learning mode explains framework application but does not support studying: no summaries, no framework comparisons, no practice questions | Students use the tool not just for assignments but to study; exam prep is a high-value adjacent use case | Low/Medium (new `/learn` skill or mode extension) | Medium |
+| Gap | Why it matters | Complexity | Impact | Status |
+|---|---|---|---|---|
+| ~~**No citation style enforcement**~~ | ~~Citation formatting is directly marked in most business school courses~~ | ~~Low~~ | ~~High~~ | **Resolved** — `/add-course` captures style; `/research` step 6, `/draft` step 2, and `/publish` step 3 all read and apply it; defaults to Harvard |
+| **Rubric not parsed from PDF** — marking criteria are only extracted if the user pastes them; rubric tables in PDF briefs are not auto-read | Misinterpreting a 30% criterion vs. a 10% one is a significant quality risk | Low (prompt fix to read attached PDF and extract rubric table) | High | Open |
+| ~~**`/review` not weighted by rubric**~~ | ~~A 7/10 score means nothing without knowing whether the highest-weighted criterion was addressed proportionally~~ | ~~Medium~~ | ~~High~~ | **Resolved** — `/review` builds a weighting table in Step 0; applies score caps by criterion weight and issue severity; shows binding constraint |
+| **No learning scaffolding for exam prep** — learning mode explains framework application but does not support studying: no summaries, no framework comparisons, no practice questions | Students use the tool not just for assignments but to study; exam prep is a high-value adjacent use case | Low/Medium (new `/learn` skill or mode extension) | Medium | Open |
 
 ---
 
 ### 11.7 Professional Use Case
 
-| Gap | Why it matters | Complexity | Impact |
-|---|---|---|---|
-| **No client context system** — professional mode has no concept of a named client with persistent context (industry, risk tolerance, preferences) | Every session starts from scratch; a real engagement spans weeks and accumulates context | Medium (new `/client` command analogous to `/add-course`) | Medium |
-| **No `/competitor` skill** — no structured way to profile a competitor (financials, strategy, products, leadership, recent moves) | Competitor profiling is one of the most common early consulting tasks | Low/Medium (parallel agent set per topic area) | High |
-| **No market sizing skill** — TAM/SAM/SOM and bottom-up sizing models are referenced but not computable | Telling a client "the market is approximately $X" without a defensible model is not consulting | Medium (new `/size [market]` skill with structured top-down arithmetic) | High |
-| **No quantitative modeling** — break-even, scenario modeling, sensitivity analysis, DCF cannot be computed | Professional consulting work always involves numbers; the plugin can structure but not calculate | High (requires computational tools or MCP) | High |
-| **Limited deliverable formats** — only slides, report, and memo; missing board briefings, status updates, steering committee decks, Issue-Action logs | Interns and analysts on real engagements need these formats | Low (additional format options in `/draft`) | Medium |
+| Gap | Why it matters | Complexity | Impact | Status |
+|---|---|---|---|---|
+| ~~**No client context system**~~ | ~~Professional mode has no concept of a named client with persistent context~~ | ~~Medium~~ | ~~Medium~~ | **Resolved** — `/client` saves name, industry, risk tolerance, stakeholders, constraints, and engagement history; `/consult` reads it in professional mode |
+| ~~**No `/competitor` skill**~~ | ~~Competitor profiling is one of the most common early consulting tasks~~ | ~~Low/Medium~~ | ~~High~~ | **Resolved** — `/competitor` spawns 5 parallel agents, validates with 5 Advisors, produces a one-page profile + 2–3 sentence threat assessment |
+| ~~**No market sizing skill**~~ | ~~Telling a client "the market is approximately $X" without a defensible model is not consulting~~ | ~~Medium~~ | ~~High~~ | **Resolved** — `/size` builds top-down TAM/SAM/SOM + bottom-up cross-check + sensitivity table with sourced assumptions |
+| **No quantitative modeling** — break-even, scenario modeling, sensitivity analysis, DCF cannot be computed | Professional consulting work always involves numbers; the plugin can structure but not calculate | High (requires computational tools or MCP) | High | Open — v2.0 |
+| ~~**Limited deliverable formats**~~ | ~~Interns and analysts on real engagements need board briefings and issue-action logs~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — `/draft board brief` and `/draft issue-action log` added with dedicated templates |
 
 ---
 
@@ -523,11 +708,11 @@ A structured review of missing capabilities across all dimensions of the plugin.
 
 ## 12. Roadmap
 
-Milestones are sequenced by dependency and impact. Items within a milestone are independent and can be built in any order. v1.4 (session persistence) unlocks several items in v1.5 — do not attempt those before v1.4 is complete.
+Milestones are sequenced by dependency and impact. v1.2 through v1.5 are complete. v2.0 requires external tooling (MCP servers, APIs) and is the current active milestone.
 
 ---
 
-### v1.2 — Academic quality polish
+### v1.2 — Academic quality polish ✓ Complete
 **Goal**: Close the highest-impact gaps for the core academic use case with minimal architectural change. All items are prompt updates or small new skills.
 
 ---
@@ -614,7 +799,7 @@ Milestones are sequenced by dependency and impact. Items within a milestone are 
 
 ---
 
-### v1.3 — Framework library expansion
+### v1.3 — Framework library expansion ✓ Complete
 **Goal**: Write the missing framework template files so `/framework` always uses a calibrated application guide rather than falling back to generic Claude knowledge.
 
 ---
@@ -661,7 +846,7 @@ Each template must include: when to use, data to collect per dimension, output s
 
 ---
 
-### v1.4 — Session persistence
+### v1.4 — Session persistence ✓ Complete
 **Goal**: Allow projects to span multiple sessions without re-running research. This milestone is a prerequisite for v1.5 items that depend on project state.
 
 ---
@@ -740,7 +925,7 @@ Last updated: [date]
 
 ---
 
-### v1.5 — New skills and professional mode
+### v1.5 — New skills and professional mode ✓ Complete
 **Goal**: Add skills that serve both academic and professional users, and extend professional mode with the context system it currently lacks.
 
 ---
@@ -798,7 +983,7 @@ Last updated: [date]
 
 ---
 
-### v2.0 — Platform and integration
+### v2.0 — Platform and integration (active)
 **Goal**: Solve the remaining high-complexity gaps that require external tools, APIs, or MCP servers. These are not blocked on earlier milestones but require more engineering investment.
 
 ---
