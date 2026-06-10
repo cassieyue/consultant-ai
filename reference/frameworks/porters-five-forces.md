@@ -91,14 +91,22 @@ How intense is competition among existing players?
 
 ## Output structure
 
-Rate each force: **High / Medium / Low** threat/power.
+Start with a summary table:
 
-> **[Force]**: [Rating] — [2-3 sentences of evidence with specific data] → **Implication**: [what this means for profitability and the company's position]
+| Force | Key Evidence | Rating | Implication for [company/decision] |
+|---|---|---|---|
+| Threat of new entrants | [1–2 specific data points] | High / Medium / Low | [so what] |
+| Supplier power | [1–2 specific data points] | High / Medium / Low | [so what] |
+| Buyer power | [1–2 specific data points] | High / Medium / Low | [so what] |
+| Threat of substitutes | [1–2 specific data points] | High / Medium / Low | [so what] |
+| Competitive rivalry | [1–2 specific data points] | High / Medium / Low | [so what] |
+
+Then expand each row: 2–3 sentences of supporting evidence and the strategic implication. Every claim must cite a specific data point — not "competition is intense" but "five players with near-equal market share and no differentiation, EBITDA margins compressed to 4% (IBISWorld 2024)".
 
 ## Final synthesis
 **Overall industry attractiveness**: High / Medium / Low
 
-State which 1-2 forces are most threatening and which represent opportunities. Then connect to strategy: how should the company position itself given these forces?
+State which 1–2 forces are most threatening and which represent opportunities. Then connect to strategy: how should the company position itself given these forces?
 
 ## Common mistakes
 - Rating forces without evidence ("rivalry is high because there are many competitors" — how many? what's their market share?)

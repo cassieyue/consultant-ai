@@ -49,10 +49,16 @@ Axes:
 
 ## Output structure
 
-For each business unit/product:
-> **[Unit]**: [Quadrant] — Market share = X% vs. leader's Y% (relative share = Z). Market growing at X% CAGR. → **Recommendation**: [Invest / Maintain / Harvest / Divest] because [reason].
+Start with a positioning table:
 
-Then state the portfolio-level implication: Is the portfolio balanced? Are the Cash Cows funding enough Stars? Are there too many Dogs?
+| Business Unit | Company Share | Leader's Share | Relative Share | Market Growth (CAGR) | Quadrant | Strategic Action |
+|---|---|---|---|---|---|---|
+| [Unit A] | X% | Y% | Z.Z | X% | Star / Cash Cow / Question Mark / Dog | Invest / Maintain / Harvest / Divest |
+
+Then expand each row with 2–3 sentences of reasoning — why this unit lands in this quadrant and why the recommended action follows:
+> **[Unit]**: [Quadrant] — [evidence for share position]. [Evidence for growth rate]. → **Recommendation**: [Invest / Maintain / Harvest / Divest] because [specific reason].
+
+Then state the portfolio-level implication: Is the portfolio balanced? Are the Cash Cows generating enough cash to fund the Stars and promising Question Marks? Are there Dogs draining resources that should be divested?
 
 ## Common mistakes
 - Applying BCG to a single-product company (it's a portfolio tool — you need multiple units to compare)

@@ -23,6 +23,7 @@ If this is an academic project, confirm:
 - Marking criteria and weights
 - Source/citation requirements
 - Format constraints (slide count, word limit, time limit)
+- Citation style — check `~/.claude/memory/consultant-ai-courses.md` first; ask only if not registered
 
 ### 3. Apply the Pyramid Principle
 
@@ -90,5 +91,19 @@ Apply throughout:
 If this is a class assignment:
 - After drafting, map each marking criterion to the section(s) that address it
 - Flag any criterion that isn't clearly covered
-- Ensure citation format matches what the course requires
+- Apply the citation style registered in course context. If none registered, default to Harvard (Author-Date). Format every citation and the full reference list consistently in that style.
 - Include a reference slide/section with all sources
+
+### 9. Word and slide count enforcement
+
+After generating the full output:
+
+**For written deliverables (reports, memos)**: Estimate the word count of the draft. Compare against any stated word limit.
+- If within limit: report "Approximately [N] words — within [limit] word limit"
+- If over: "Approximately [N] words — [N - limit] words over the [limit] limit. Longest sections: [list top 2–3 sections by length]. Suggested cuts: [specific sentences or sections to trim]"
+
+**For slide decks**: Count total slides. Compare against any stated slide limit.
+- If within limit: report "[N] slides — within [limit] slide limit"
+- If over: "Deck is [N] slides — [N - limit] over the [limit] limit. Candidates to cut or merge: [list specific slides]"
+
+If no constraint was stated, report the count only (no flag).

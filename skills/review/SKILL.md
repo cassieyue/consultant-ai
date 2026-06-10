@@ -11,6 +11,33 @@ Ask the user to share the work if it hasn't been shared yet.
 
 ---
 
+## Step 0 — Load marking criteria (academic mode only)
+
+If this is an academic project:
+
+1. Read marking criteria and weights from session context. If not available, ask the user to share them before proceeding.
+
+2. Build a weighting map:
+
+| Criterion | Weight | Sections addressing it | Coverage |
+|---|---|---|---|
+| [criterion] | [X%] | [section(s)] | Strong / Partial / Missing |
+
+3. Apply weight-adjusted scoring caps — a highly-weighted criterion with critical issues cannot be masked by strong performance elsewhere:
+
+| Situation | Max score |
+|---|---|
+| Criterion ≥40% weight has a Critical Issue | 5/10 |
+| Criterion ≥30% weight has a Critical Issue | 6/10 |
+| Criterion ≥20% weight has a Critical Issue | 7/10 |
+| Criterion ≥15% weight has an Important Issue | 8/10 |
+| All criteria at least partially covered | 9/10 |
+| All criteria strongly covered at their weights | 10/10 |
+
+In the summary output, state which criterion is the binding constraint if a cap applies.
+
+---
+
 ## Review checklist
 
 Run through every item. For each failure, state:
@@ -61,9 +88,12 @@ Run through every item. For each failure, state:
 
 ```
 READINESS SCORE: [X/10]
+[Academic mode only: Weight-adjusted score]
+[If a cap applies: "Score capped at [X]/10 — [criterion] ([weight]%) has a Critical Issue"]
+[Criterion coverage: [criterion] [weight]% → [Strong / Partial / Missing]]
 
 CRITICAL ISSUES (must fix before submission):
-1. [Issue] — [where] — [fix]
+1. [Issue] — [criterion it affects, if academic] — [where] — [fix]
 2. ...
 
 IMPORTANT ISSUES (fix if time allows):
@@ -73,5 +103,5 @@ IMPORTANT ISSUES (fix if time allows):
 MINOR ISSUES:
 1. ...
 
-TO REACH 10/10: [what specifically is missing]
+TO REACH 10/10: [what specifically is missing, mapped to criteria and weights if academic]
 ```

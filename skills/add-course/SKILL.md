@@ -12,6 +12,7 @@ You are helping the user register a course so the Consultant AI plugin can prior
    - Business domain (strategy, marketing, finance, supply chain, IS, international business, operations)
    - Frameworks and topics currently being covered
    - Any notes on how the professor teaches or emphasizes specific frameworks
+   - **Citation style**: Harvard (Author-Date) | APA 7th | Chicago (Notes-Bibliography) | MLA 9th | Other (ask user to specify)
 
 2. Read `~/.claude/memory/consultant-ai-courses.md` if it exists. Append the new course without overwriting existing entries.
 
@@ -23,6 +24,7 @@ You are helping the user register a course so the Consultant AI plugin can prior
 ## [Course Name]
 Added: [today's date]
 Domain: [domain(s)]
+Citation style: [Harvard / APA 7th / Chicago / MLA 9th / other]
 Frameworks being studied:
 - [Framework name]: [any professor-specific notes, e.g. "professor emphasizes applying to emerging markets"]
 - [Framework name]: ...
@@ -34,5 +36,5 @@ Notes: [anything else relevant — assignment types, source requirements, etc.]
 
 4. Confirm to the user:
    - What was saved
-   - How it affects `/consult` — the orchestrator will now prioritize these frameworks when it detects a project in this domain
+   - How it affects `/consult` — the orchestrator will now prioritize these frameworks when it detects a project in this domain, and `/draft`, `/research`, and `/publish` will format citations in the registered style
    - Remind them they can run `/add-course` again to update as the course progresses

@@ -28,7 +28,7 @@ _link() {
 _link ~/.claude/commands/consult.md "$REPO_DIR/SKILL.md" "consult"
 
 # Symlink each skill
-for skill in add-course brief structure research framework draft review critique publish references; do
+for skill in add-course brief structure research framework draft review critique publish references compare help; do
   _link ~/.claude/commands/${skill}.md "$REPO_DIR/skills/${skill}/SKILL.md" "$skill"
 done
 

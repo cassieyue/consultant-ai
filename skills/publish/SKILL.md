@@ -35,15 +35,30 @@ If major sections are missing, ask the user to paste them in before generating. 
 
 ### 3. Compile the works cited
 
-Collect every source cited anywhere in the session into a single deduplicated list. Format by source type:
+First, read `~/.claude/memory/consultant-ai-courses.md` for the registered citation style. Apply the matching format for all source types. If no style is registered, default to Harvard (Author-Date).
 
-**Academic journal**: Author Surname, Initial(s). (Year). "Article title." *Journal Name*, Volume(Issue), pages.
-**Report / institutional**: Organization Name. (Year). *Report Title*. Publisher/Institution.
-**News / press**: Author Surname, Initial(s). (Year, Month Day). "Article title." *Publication Name*. URL.
-**Company filing**: Company Name. (Year). *Document Type* (e.g. Annual Report). Publisher.
-**Website**: Organization. (Year). *Page Title*. Retrieved from URL.
+**Harvard (Author-Date)**:
+- Journal: Surname, I. (Year) 'Article title', *Journal Name*, vol. X, no. X, pp. X–X.
+- Report: Organisation (Year) *Report Title*. Publisher.
+- News: Surname, I. (Year) 'Article title', *Publication*, Day Month.
+- Website: Organisation (Year) *Page Title*. Available at: URL (Accessed: Day Month Year).
 
-Sort alphabetically by the first word (surname or organization). Number them sequentially — these numbers are used as inline citation references in the HTML body.
+**APA 7th**:
+- Journal: Surname, I. (Year). Article title. *Journal Name*, *Volume*(Issue), pages. https://doi.org/...
+- Report: Organisation. (Year). *Report Title*. Publisher. URL
+- News: Surname, I. (Year, Month Day). Article title. *Publication Name*. URL
+
+**Chicago (Notes-Bibliography)**:
+- Journal: Surname, First Name. "Article Title." *Journal Name* Vol, no. X (Year): pages.
+- Report: Organisation. *Report Title*. Publisher, Year.
+- News: Surname, First Name. "Article Title." *Publication*, Month Day, Year.
+
+**MLA 9th**:
+- Journal: Surname, First Name. "Article Title." *Journal Name*, vol. X, no. X, Year, pp. X–X.
+- Report: Organisation. *Report Title*. Publisher, Year.
+- News: Surname, First Name. "Article Title." *Publication*, Day Month Year.
+
+Collect every source cited anywhere in the session into a single deduplicated list. Sort alphabetically by the first word (surname or organization). Number them sequentially — these numbers are used as inline citation references in the HTML body.
 
 ### 4. Write the HTML file
 

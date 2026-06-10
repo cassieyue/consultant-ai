@@ -137,6 +137,24 @@ CAVEATS
 
 ### 6. Source formatting
 
-For academic papers: Author(s), Year. "Title." *Journal*, Volume(Issue), pages.
-For reports: Organization, Year. *Report Title*. Publisher.
-For news/press: Author, Year. "Article Title." *Publication*, Date.
+Read `~/.claude/memory/consultant-ai-courses.md` for the registered citation style. Apply the matching format:
+
+**Harvard (Author-Date)** (default if no style registered):
+- Journal: Surname, I. (Year) 'Article title', *Journal Name*, vol. X, no. X, pp. X–X.
+- Report: Organisation (Year) *Report Title*. Publisher.
+- News: Surname, I. (Year) 'Article title', *Publication*, Day Month.
+
+**APA 7th**:
+- Journal: Surname, I. (Year). Article title. *Journal Name*, *Volume*(Issue), pages. https://doi.org/...
+- Report: Organisation. (Year). *Report Title*. Publisher. URL
+- News: Surname, I. (Year, Month Day). Article title. *Publication Name*. URL
+
+**Chicago (Notes-Bibliography)**:
+- Journal: Surname, First Name. "Article Title." *Journal Name* Vol, no. X (Year): pages.
+- Report: Organisation. *Report Title*. Publisher, Year.
+- News: Surname, First Name. "Article Title." *Publication*, Month Day, Year.
+
+**MLA 9th**:
+- Journal: Surname, First Name. "Article Title." *Journal Name*, vol. X, no. X, Year, pp. X–X.
+- Report: Organisation. *Report Title*. Publisher, Year.
+- News: Surname, First Name. "Article Title." *Publication*, Day Month Year.
