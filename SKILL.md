@@ -53,14 +53,22 @@ Show the issue tree to the user. Get confirmation before moving to research.
 
 ---
 
-## Step 4 — Select frameworks
+## Step 4 — Select framework sequence
 
-Based on domain and course context, recommend 2–4 frameworks. For each:
-- Name the framework
+Read `~/.claude/consultant-ai/frameworks/index.md` — it contains both domain-to-framework mappings and a "Recommended framework sequences by brief type" section at the bottom.
+
+Recommend a **sequence** of 2–4 frameworks, not just a list. For each framework:
+- Name it
 - One sentence on why it applies to this specific problem
-- If the user is currently studying it (from course context), flag it as a priority
+- What output from this framework feeds the next framework in the sequence
+- Flag it as a priority if the user is currently studying it (from course context)
 
-Read `~/.claude/consultant-ai/frameworks/index.md` for domain-to-framework mappings.
+**Sequence logic**: Each "Combines with" section in a framework template states which frameworks to run next and what to pass between them. Use these to chain frameworks logically — the output of framework A becomes the input to framework B.
+
+Example for a market entry brief:
+> "PESTEL first (country attractiveness) → Porter's Five Forces (feeds the Threats and Opportunities from macro into competitive assessment) → CAGE (quantifies how distant this market is for us specifically) → Modes of Entry (CAGE Administrative distance constrains feasible entry modes)"
+
+Show the user the proposed sequence as a numbered chain before proceeding.
 
 ---
 

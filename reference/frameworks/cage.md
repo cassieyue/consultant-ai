@@ -84,3 +84,8 @@ CAGE is a prioritization tool, not a veto. The question is: does the attractiven
 - Using CAGE only to confirm the choice you already made, rather than genuinely comparing alternatives
 - Treating all dimensions as equally weighted — weight by relevance to the specific business (a software company cares less about geographic distance than a manufacturer)
 - Conflating CAGE with PESTEL — CAGE measures distance from home, PESTEL measures absolute attractiveness
+
+## Combines with
+- **Modes of Entry**: CAGE is the natural predecessor to Modes of Entry — high Administrative distance (weak IP protection, restricted foreign ownership) directly constrains which entry modes are legally feasible; high Cultural distance pushes toward JV with a local partner
+- **PESTEL**: CAGE's Political/Administrative dimension overlaps with PESTEL's Political and Legal dimensions; run PESTEL for absolute country assessment, CAGE for relative distance from home — together they answer both "Is this market attractive?" and "Can we succeed there given who we are?"
+- **Hofstede**: Hofstede's cultural dimensions provide the quantitative evidence for CAGE's Cultural distance score — do not estimate cultural distance without Hofstede data; the dimension scores (PDI, IDV, MAS, UAI) make cultural distance specific and comparable across markets

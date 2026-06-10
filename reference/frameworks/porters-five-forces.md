@@ -112,3 +112,8 @@ State which 1–2 forces are most threatening and which represent opportunities.
 - Rating forces without evidence ("rivalry is high because there are many competitors" — how many? what's their market share?)
 - Not connecting the analysis to a strategic implication
 - Applying the framework to the wrong level (company vs. industry — this is an industry-level framework)
+
+## Combines with
+- **PESTEL**: PESTEL is the macro layer; Five Forces is the competitive layer. Run PESTEL first — macro factors (regulation, economic cycle, technology) shape the intensity of each force; combine both in the industry attractiveness conclusion
+- **VRIO**: Five Forces tells you what competitive advantage you need; VRIO tells you whether the company actually has it. After identifying the most threatening forces, use VRIO to assess whether the company's resources can neutralise them
+- **STP**: Competitive intensity and buyer power (from Five Forces) define where to target and how to position. High buyer power in mass-market segments may push positioning toward a niche where buyers have less leverage

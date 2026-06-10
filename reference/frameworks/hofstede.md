@@ -63,3 +63,8 @@ Identify the 2-3 dimensions where the gap is largest. These are where the compan
 - Describing each score in isolation without comparing to the home country (the gap is what matters)
 - Treating scores as deterministic — they describe tendencies, not individual behavior
 - Applying cultural generalizations to business decisions without connecting to the specific industry or consumer base
+
+## Combines with
+- **CAGE Distance Framework**: Hofstede scores provide the quantitative evidence for CAGE's Cultural distance dimension; feed dimension gaps (PDI, IDV, MAS, UAI, LTO) directly into the CAGE cultural distance assessment rather than estimating cultural distance qualitatively
+- **Modes of Entry**: High cultural distance — especially high Power Distance or Uncertainty Avoidance in the target market — pushes toward higher-control entry modes (JV with culturally fluent local partner or WOS with local management team); low distance supports lighter-touch entry
+- **STP**: Hofstede dimensions shape customer preferences, communication style, and buying behavior in the target market — IDV/COL affects how to structure marketing messages (individual benefit vs. social proof); PDI affects distribution channel and sales relationship preferences

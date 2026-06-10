@@ -85,3 +85,8 @@ Identify the 2-3 highest-priority improvement areas. Quantify the potential impa
 - Describing supply chain activities without assessing performance against a standard
 - Recommending technology solutions without first diagnosing whether the problem is process, people, or systems
 - Ignoring the Enable layer — poor data quality or systems undermine every other process
+
+## Combines with
+- **Make-vs-Buy**: SCOR's Source process is directly the Make-vs-Buy decision for every major input — SCOR performance data (supplier lead times, procurement cost as % of COGS, supplier concentration) provides the TCO evidence needed for a rigorous Make-vs-Buy analysis
+- **Value Chain**: SCOR maps the supply chain in detail, covering the Inbound Logistics, Operations, and Outbound Logistics activities of the value chain; use both frameworks together for a full picture — SCOR on supply chain performance, Value Chain on how supply chain connects to overall competitive position
+- **McKinsey 7S**: SCOR improvement recommendations frequently require organizational changes to Systems, Staff, and Skills to sustain — use 7S to assess whether the organization is aligned to execute the SCOR improvement plan, and to identify which 7S elements are causing the supply chain underperformance

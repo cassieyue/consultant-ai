@@ -78,3 +78,8 @@ Which 2-3 misalignments are most critical to fix for the strategy to succeed? Pr
 - Describing each element without assessing alignment — a description is not an analysis
 - Treating Shared Values as a soft/unimportant element — culture is often the hardest thing to change and the most important for execution
 - Using the framework for competitive analysis (it's internal — use Porter's Five Forces or PESTEL for external)
+
+## Combines with
+- **VRIO**: 7S surfaces the organizational elements that constitute the company's resources and capabilities (Staff, Skills, Systems, Shared Values); use VRIO to test which of those elements are Valuable, Rare, Inimitable, and Organized — 7S identifies what the organization has, VRIO determines which of those things are competitive advantages
+- **Balanced Scorecard**: 7S alignment gaps (especially in Systems and Skills) explain the Learning & Growth and Internal Process gaps that a BSC reveals; use 7S to diagnose the root cause of BSC KPIs that are off-track, and use the BSC to track whether 7S improvements are delivering results
+- **SWOT**: 7S provides structured internal evidence for SWOT's Strengths and Weaknesses quadrants — instead of listing vague strengths ("good culture"), 7S produces specific misalignments and capabilities that map directly to SWOT internal factors

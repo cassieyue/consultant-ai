@@ -72,3 +72,8 @@ Connect STP to the Marketing Mix (4Ps): How does the chosen positioning inform p
 - Defining segments so broadly they're not actionable ("millennials" is not a segment — "urban millennials aged 25-34 with household income >$60K who prioritize sustainability" is)
 - Targeting too many segments with limited resources — concentrated focus usually outperforms spreading thin
 - Positioning on features rather than benefits — customers buy outcomes, not specifications
+
+## Combines with
+- **Marketing Mix (4Ps/7Ps)**: STP defines *who* you are targeting and *how* you want to be perceived; the Marketing Mix operationalises that positioning — every Mix choice (product features, price point, distribution channel, messaging) must be traceable back to the target segment and positioning statement
+- **Porter's Five Forces**: Competitive intensity and buyer power (from Five Forces) constrain positioning options — in markets with high rivalry and low differentiation, niche positioning (Concentrated targeting) is often the only viable strategy; Five Forces analysis validates whether the chosen positioning is defensible
+- **SWOT**: Target segment selection should be informed by the company's Strengths — the best segment is one where the company's capabilities produce the most valued differentiation; positioning should exploit Strengths and avoid exposing Weaknesses

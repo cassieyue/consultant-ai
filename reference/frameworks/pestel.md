@@ -82,3 +82,8 @@ Identify the 2-3 factors that most strongly support entry and the 2-3 that most 
 - Listing facts without drawing implications ("GDP is $X billion" is not analysis)
 - Treating all factors as equally important — weight by relevance to the specific business
 - Not distinguishing between current state and trend (a stable but improving environment is different from a stable but deteriorating one)
+
+## Combines with
+- **Porter's Five Forces**: PESTEL covers the macro environment; Porter's maps the competitive environment. Run PESTEL first — the Political, Economic, and Technological factors directly feed the Five Forces analysis (e.g., regulatory barriers to entry, economic cycle effects on rivalry)
+- **CAGE Distance Framework**: If comparing multiple target markets, PESTEL assesses absolute attractiveness of each; CAGE measures distance from home. Run both — PESTEL answers "Is this a good market?" and CAGE answers "How hard will it be for us specifically?"
+- **Modes of Entry**: PESTEL's Legal and Political dimensions (foreign ownership rules, IP protection, corruption) are direct inputs to the Modes of Entry decision framework — they constrain which entry modes are feasible in the target market

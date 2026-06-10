@@ -64,3 +64,8 @@ State the chosen mode clearly and explain why the alternatives were ruled out. D
 - Describing each mode generically without applying it to the specific company and market
 - Not ruling out alternatives explicitly — the strongest analysis explains why NOT, not just why yes
 - Ignoring legal constraints on foreign ownership (always check this first)
+
+## Combines with
+- **CAGE Distance Framework**: CAGE is the natural predecessor — Administrative distance constrains which entry modes are legally feasible (some markets require a local JV partner); Geographic distance affects the viability of exporting and the cost of managing a WOS; Cultural distance affects whether a greenfield or acquisition is preferable
+- **VRIO**: Entry mode should protect the company's sources of competitive advantage — if the advantage is an inimitable technology (VRIO: I = Yes), a JV that requires sharing IP with a local partner directly threatens that advantage; VRIO output is a prerequisite for a rigorous entry mode recommendation
+- **PESTEL**: PESTEL's Legal and Political dimensions directly determine which entry modes are available — foreign ownership restrictions (Legal), political risk affecting FDI appetite (Political), and IP enforcement (Legal) all constrain the decision before cost or capability factors come into play

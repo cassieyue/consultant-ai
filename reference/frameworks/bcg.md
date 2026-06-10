@@ -65,3 +65,8 @@ Then state the portfolio-level implication: Is the portfolio balanced? Are the C
 - Not calculating relative market share (just "our share is 20%" is insufficient)
 - Taking the quadrant labels as definitive verdicts — "Dog" doesn't automatically mean divest; some Dogs are strategically important for other reasons
 - Confusing market growth rate with company revenue growth
+
+## Combines with
+- **Ansoff Matrix**: BCG position suggests the Ansoff quadrant: Stars in growing markets → continue Market Penetration or Product Development; Cash Cows in mature markets → Market Development (new geographies); Question Marks → need a decision on whether to invest toward Star status (Product Development) or divest
+- **DuPont Analysis**: Use DuPont to validate BCG positioning — Cash Cows should show stable high margins and steady asset turnover; Stars should show improving margins as scale builds; run DuPont on each business unit to confirm the financial logic behind the quadrant placement
+- **Financial Ratio Analysis**: Cash generation per unit (supporting Cash Cow classification) and return metrics (justifying Star investment) should be validated with ratio data rather than assumed

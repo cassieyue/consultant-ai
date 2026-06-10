@@ -50,10 +50,10 @@ Evaluate which quadrant best fits the company's current situation and objectives
 Then address why the other quadrants were considered and rejected:
 > **Market Penetration** considered but rejected because [reason — e.g., "market share is already 45% and is at the ceiling"].
 
-## Connecting to other frameworks
-- Use **PESTEL** to assess a new market before recommending Market Development
-- Use **VRIO** to assess whether the company has the capabilities for Product Development
-- Use **Porter's Five Forces** to assess whether Market Penetration is viable in the existing market
+## Combines with
+- **PESTEL + CAGE**: Before recommending Market Development (new geographies), run PESTEL to assess the target market's attractiveness and CAGE to assess distance from home — Ansoff names the direction, PESTEL/CAGE validates the specific destination
+- **VRIO**: Before recommending Product Development or Diversification, use VRIO to confirm the company has the capabilities the new quadrant requires — recommending a move into new products without confirming the R&D and manufacturing capabilities exist is a strategic assumption, not a recommendation
+- **CVP / Break-even**: Use break-even analysis to assess the minimum volume required for each Ansoff option — this surfaces whether the market size is sufficient for the strategy to be financially viable before committing
 
 ## Common mistakes
 - Recommending Diversification without a clear strategic rationale (high risk needs strong justification)

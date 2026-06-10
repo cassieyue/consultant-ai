@@ -80,3 +80,8 @@ State: What are the 2-3 most significant financial findings? Are they strengths 
 - Presenting ratios without benchmarks — a 15% ROE is good or bad depending on the industry
 - Calculating one year in isolation — trends over 3-5 years are more meaningful
 - Treating accounting numbers as truth — consider the quality of earnings (are margins inflated by one-time items?)
+
+## Combines with
+- **DuPont Analysis**: DuPont is a targeted drill-down on ROE — after ratio analysis identifies that ROE is below benchmark, use DuPont to decompose it into Net Profit Margin × Asset Turnover × Leverage and pinpoint which factor is driving the underperformance
+- **BCG Matrix**: In a portfolio context, ratio analysis validates BCG positioning — Cash Cows should show high and stable margins with strong cash conversion; Stars should show improving margins as scale builds; run ratios per business unit to confirm the financial logic
+- **Porter's Five Forces**: Ratio benchmarks often surface symptoms of Five Forces dynamics — compressed margins across the industry reflect high rivalry or buyer power; low asset turnover may reflect high bargaining power of suppliers; use Five Forces to explain why the ratios look the way they do

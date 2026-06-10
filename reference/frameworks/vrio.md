@@ -59,3 +59,8 @@ State: which 1-2 resources represent true sustained competitive advantages, and 
 - Applying VRIO to products/markets rather than internal resources and capabilities
 - Being too generous with "Rare" and "Inimitable" — most resources are more imitable than companies think
 - Not specifying what "organized" actually means in practice (which systems or processes need to exist)
+
+## Combines with
+- **Value Chain Analysis**: Value chain identifies which activities the company performs and at what cost; use VRIO to test whether the activities with the highest strategic importance actually produce sustained competitive advantage — value chain identifies *what* to test, VRIO determines *whether it is defensible*
+- **McKinsey 7S**: The 7S framework surfaces the organizational resources and capabilities (Staff, Skills, Shared Values, Systems) to test with VRIO; 7S tells you what the organization has, VRIO tells you which of those things are actual competitive advantages
+- **Modes of Entry**: Entry mode selection should protect VRIO advantages — if the competitive advantage is inimitable technology or brand, a JV that shares IP with a local partner threatens the "I" condition; WOS preserves the advantage intact
