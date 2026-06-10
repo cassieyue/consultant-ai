@@ -23,6 +23,8 @@ If no active project exists, proceed normally.
 
 **Course context**: Read `~/.claude/memory/consultant-ai-courses.md` if it exists. Note any frameworks the user is currently studying — these take priority in framework selection.
 
+**Client context** (professional mode): Read `~/.claude/memory/consultant-ai-clients.md` if it exists. If the brief is for a professional engagement, identify which client it relates to and note their risk tolerance, key stakeholders, and constraints. Use this to calibrate: tone (formal vs. direct), certainty level of recommendations, risk framing (how prominently to surface risks), and how to structure the deliverable for the stated audience.
+
 ---
 
 ## Step 2 — Decode the brief

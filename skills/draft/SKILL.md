@@ -13,7 +13,12 @@ Draft request: **$ARGUMENTS**
 
 - If $ARGUMENTS names a section (e.g. "executive summary", "market analysis", "modes of entry"), draft that section only
 - If $ARGUMENTS is "full" or empty, draft the complete deliverable
-- Ask about deliverable format if not already known: slides, written report, or memo
+- Ask about deliverable format if not already known:
+  - **Slides** — presentation deck with insight headers
+  - **Written report** — long-form with executive summary
+  - **Memo** — 1–2 page SCQA format
+  - **Board brief** — 1-page decision paper (situation, recommendation, financials, risks, ask)
+  - **Issue-action log** — structured tracker of open items, owners, and deadlines
 
 ### 2. Load context
 
@@ -77,7 +82,33 @@ Follow SCQA:
 - **Question**: What decision or question this raises
 - **Answer**: Your recommendation, stated directly
 
-### 7. Consulting writing standards
+### 7. Format: Board brief
+
+Read `templates/board-brief.md` for the full format specification.
+
+Use when the deliverable needs board or executive approval. Strict 1-page format:
+- **Situation**: 2–3 sentences of context — no analysis
+- **Decision required**: one precise sentence stating what approval is being sought
+- **Recommendation**: one sentence, then 2–3 supporting bullets with specific data
+- **Financial impact**: table with investment required, expected return, payback period
+- **Top risks**: 2–3 risks only (the ones that could change the board's decision) + one-line mitigation each
+- **The Ask**: restate the specific decision(s) needed as checkboxes
+
+Standards: lead with the decision not the background; one recommendation never options; every number has a unit and timeframe; maximum 1 page.
+
+### 8. Format: Issue-action log
+
+Read `templates/issue-action-log.md` for the full format specification.
+
+Use when the deliverable is a structured tracker of open items from a meeting, phase review, or /review and /critique output.
+
+Each row: Issue/Action | Owner (one named person) | Action Required (specific verb phrase) | Deadline (specific date) | Status (Open / In progress / Blocked / Closed)
+
+To populate from session content: extract every gap or next step from the analysis, every critical issue from /review, every fix from /critique, and every pending research branch. Assign realistic owners and deadlines.
+
+Standards: one owner per item; action is specific and testable; sort by deadline; closed items stay in the log.
+
+### 9. Consulting writing standards
 
 Apply throughout:
 - Active voice: "MG should enter via franchising" not "It is recommended that entry be considered"
@@ -86,7 +117,7 @@ Apply throughout:
 - No hedging: state what the analysis shows, acknowledge limitations separately
 - No filler: "In conclusion", "It is worth noting", "There are many factors" — cut all of it
 
-### 8. Academic mode adjustments
+### 10. Academic mode adjustments
 
 If this is a class assignment:
 - After drafting, map each marking criterion to the section(s) that address it
@@ -94,7 +125,7 @@ If this is a class assignment:
 - Apply the citation style registered in course context. If none registered, default to Harvard (Author-Date). Format every citation and the full reference list consistently in that style.
 - Include a reference slide/section with all sources
 
-### 9. Word and slide count enforcement
+### 11. Word and slide count enforcement
 
 After generating the full output:
 

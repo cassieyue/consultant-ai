@@ -67,12 +67,13 @@ CONSULTANT AI — SKILL REFERENCE
 
 /draft [section or "full"]
   Produce a consultant-quality deliverable.
-  Formats: slides (insight headers) · written report (SCQA) · memo
+  Formats: slides · written report · memo · board brief · issue-action log
   Applies Pyramid Principle. In academic mode: maps to marking criteria,
   applies registered citation style, enforces word/slide count.
   Example: /draft full
   Example: /draft executive summary
-  Example: /draft market entry recommendation
+  Example: /draft board brief
+  Example: /draft issue-action log
 
 /compare [framework-a] [framework-b]
   Synthesize two framework outputs. Finds agreement, resolves conflicts,
@@ -109,6 +110,29 @@ CONSULTANT AI — SKILL REFERENCE
   Sources are clickable; search and filter by tier.
   Example: /references
   Example: /references ~/Documents/byd-nigeria-references.html
+
+── PROFESSIONAL MODE ────────────────────────────────────
+
+/client [client name or description]
+  Register a client for professional mode work. Saves risk tolerance,
+  key stakeholders, constraints, and engagement history.
+  /consult reads this to calibrate tone and recommendation framing.
+  Example: /client Acme Corp — automotive, conservative risk appetite
+
+/competitor [company name]
+  Build a one-page competitor profile using 5 parallel research agents.
+  Covers: financials, products/positioning, strategy, leadership,
+  weaknesses. Ends with a specific 2–3 sentence threat assessment.
+  Includes 5 Advisors validation. Confirmation gate before agents spawn.
+  Example: /competitor BYD — in the context of Nigeria market entry
+  Example: /competitor Tesla
+
+/size [market description]
+  Build a market sizing model: top-down TAM/SAM/SOM + bottom-up
+  cross-check. Every assumption sourced or flagged. Sensitivity table
+  showing pessimistic/base/optimistic range.
+  Example: /size electric vehicles in Nigeria
+  Example: /size plant-based food market in the UK
 
 ── PROJECT MANAGEMENT ───────────────────────────────────
 
