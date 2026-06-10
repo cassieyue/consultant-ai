@@ -1,9 +1,9 @@
 # Product Requirements Document
 # Consultant AI — Claude Code Plugin
 
-**Version**: 1.0  
-**Status**: In development  
-**Last updated**: 2026-06-08
+**Version**: 1.1  
+**Status**: Active  
+**Last updated**: 2026-06-09
 
 ---
 
@@ -81,17 +81,23 @@ The plugin operates in three modes, detected automatically from the brief and ad
 3. Confirm reading with user
 4. Build MECE issue tree and state initial hypothesis
 5. Select frameworks (course-prioritized)
-6. Spawn parallel research agents — one per issue tree branch
-7. Synthesize findings using Pyramid Principle
-8. Draft deliverable in required format
+6. **Confirmation gate**: show research plan (sub-questions, agent count, estimated time); offer Full research / Quick draft / Edit scope
+7. Spawn parallel research agents — one per issue tree branch
+8. **Error recovery**: if agents fail partially, surface which sub-questions are missing and ask retry / continue / abort; do not synthesize with fewer than 2 usable findings
+9. **5 Advisors validation**: extract 5–8 key claims; spawn Contrarian agent (tries to refute each claim) and First Principles agent (verifies primary source traceability) in parallel; score claims HIGH / MEDIUM / FLAG / DISPUTED / UNVERIFIED
+10. Synthesize only HIGH and MEDIUM findings using Pyramid Principle; surface DISPUTED/UNVERIFIED claims in a separate Caveats block
+11. Draft deliverable in required format
 
-**Output**: Complete analysis and draft deliverable
+**Output**: Complete analysis and draft deliverable with per-claim confidence scores and a caveats block for disputed findings
 
 **Acceptance criteria**:
 - Correctly identifies domain in ≥1 of: strategy, marketing, finance, supply chain, IS, international business, operations
 - Produces a MECE issue tree with 2–4 branches
 - States a hypothesis before researching (not after)
+- Confirmation gate fires before any agent is spawned — user always approves
 - Spawns ≥2 parallel agents for multi-branch problems
+- Validation agents run after research; every key claim has a confidence tier
+- Synthesis cites only HIGH/MEDIUM claims; DISPUTED/UNVERIFIED appear in Caveats
 - Draft follows Pyramid Principle: answer first, arguments, evidence
 - In academic mode: every marking criterion is explicitly addressed
 
@@ -159,25 +165,27 @@ The plugin operates in three modes, detected automatically from the brief and ad
 ---
 
 ### 5.5 `/research` — Parallel research
-**What it does**: Conducts structured research on a specific question using parallel agents.
+**What it does**: Conducts structured research on a specific question using parallel agents, then validates key claims before synthesis.
 
 **Inputs**: Research question or topic
 
 **Process**:
 1. Decompose question into 3–5 sub-questions
-2. Spawn one agent per sub-question simultaneously
-3. Each agent searches for authoritative sources and extracts specific data points
-4. Evaluate source authority and flag weak sources
-5. Synthesize across all agents: finding, confidence level, gaps
+2. **Confirmation gate**: show sub-question list; offer Start research / Edit sub-questions
+3. Spawn one agent per sub-question simultaneously
+4. **Error recovery**: if agents fail partially, surface missing sub-questions and ask retry / continue / abort; minimum 2 usable sub-questions before synthesis
+5. **5 Advisors validation**: extract key claims; run Contrarian and First Principles agents in parallel; score each claim HIGH / MEDIUM / FLAG / DISPUTED / UNVERIFIED
+6. Synthesize only HIGH/MEDIUM findings; surface DISPUTED/UNVERIFIED in a Caveats block
 
 **Source priority**: Academic journals/textbooks → Government/multilateral reports (World Bank, IMF, OECD) → Specialist press (FT, Bloomberg, HBR) → Quality news
 
-**Output**: Per sub-question: finding, key data points with attribution, source citations, so what. Overall: answer, confidence, gaps.
+**Output**: Per sub-question: finding, key data, sources, confidence tier, so what. Overall: validated answer, confidence, gaps, caveats.
 
 **Acceptance criteria**:
+- Confirmation gate fires before agents are spawned
 - ≥2 agents spawned in parallel for any multi-part question
-- Every data point attributed to a specific source
-- Source authority is assessed, not assumed
+- Every data point attributed to a specific source with confidence tier
+- DISPUTED and UNVERIFIED claims isolated in Caveats, not used in synthesis
 - Gaps are explicitly surfaced
 
 ---
@@ -220,6 +228,94 @@ The plugin operates in three modes, detected automatically from the brief and ad
 - Every finding references a specific part of the work
 - Distinguishes critical (must fix) from minor (nice to fix)
 - Provides actionable fix for each issue, not just identification
+
+---
+
+### 5.8 `/brief` — Brief decoder
+**What it does**: Decodes any assignment brief or project description into a structured analysis before any research begins.
+
+**Inputs**: File path (PDF) or pasted text via `$ARGUMENTS`; falls back to asking if empty
+
+**Process**:
+1. Read the brief (file or text)
+2. Load course context to identify currently-studied frameworks
+3. Extract and present: domain, mode, deliverable format, constraints, central question, examiner intent, marking criteria with weights, recommended frameworks (flagging course-registered ones), gaps and ambiguities
+4. Close with a one-line next-step recommendation
+
+**Output**: Structured breakdown + recommended next command
+
+**Acceptance criteria**:
+- Extracts marking criteria with percentage weights when present
+- Flags course-registered frameworks as priority
+- Surfaces ambiguities that affect analytical approach (e.g. no country specified, weighting not given)
+- "Examiner intent" goes beyond restating the brief — reads what a high mark actually requires
+
+---
+
+### 5.9 `/critique` — Adversarial stress-test
+**What it does**: Applies the 5 Modes framework to find specific weaknesses in a recommendation or plan before submission.
+
+**Inputs**: Recommendation, plan, or draft section via `$ARGUMENTS` or pasted after invocation
+
+**Process**:
+1. Classify the decision type: recommendation logic / market selection / strategic direction / plan feasibility / root cause analysis
+2. Select 2–3 modes based on decision type and explain the selection
+3. Apply each mode analytically (no agent spawning — reasoning lenses on existing work):
+   - **Devil's Advocate**: logical gaps, unaddressed alternatives, examiner attack vector
+   - **Contrarian Investor**: downside scenario, probability-weighted risk, opportunity cost, bet verdict
+   - **Founder Thinking**: patch vs. solve, first-best solution, real vs. assumed constraints
+   - **First Principles**: established facts vs. inferences vs. assumptions, where the evidence chain breaks
+   - **Therapist CEO**: stated vs. actual problem, structural reasons the recommendation may fail
+4. Produce a verdict: weakest link (one sentence), top 3 fixes, what survives scrutiny
+
+**Output**: Per-mode structured critique + combined verdict
+
+**Acceptance criteria**:
+- Mode selection is explained before critique runs
+- Every finding references a specific claim or section in the work — no generic consulting observations
+- "Weakest link" is a single, specific sentence
+- "What survives scrutiny" is honest — not softened praise
+
+---
+
+### 5.10 `/references` — Source verification page
+**What it does**: Generates a standalone HTML page with every source from the session as a clickable link, grouped by authority tier, with a live search filter.
+
+**Inputs**: Optional output path; defaults to `~/Documents/[project]-references.html`
+
+**Process**:
+1. Scan session for all cited sources
+2. Classify each into: Tier 1 Academic / Tier 2 Institutional / Tier 3 Specialist press / Tier 4 General press
+3. For each source: record title, publication, author, year, URL (only if real — never invented), and what claim it was used to establish
+4. Write self-contained HTML with sticky search bar, tier filter buttons, and color-coded source cards
+
+**Output**: HTML file at specified path
+
+**Acceptance criteria**:
+- Every source has a "used to establish" note — not just a citation
+- URLs are only included when genuinely known; no invented URLs
+- Search and tier filter work without external dependencies
+- Unlinked sources are clearly labelled as such
+
+---
+
+### 5.11 `/publish` — HTML report
+**What it does**: Compiles all session analysis into a self-contained HTML report with cover page, table of contents, all framework outputs, recommendation block, and alphabetically sorted works cited.
+
+**Inputs**: Optional output path; defaults to `~/Documents/[project]-report.html`
+
+**Process**:
+1. Collect all session content: executive summary, research findings, framework analyses, recommendation, sources
+2. Compile works cited — deduplicated, alphabetically sorted, formatted by source type
+3. Write self-contained HTML (all CSS inline, no external dependencies, no JavaScript required)
+
+**Output**: HTML file openable in any browser; printable to PDF
+
+**Acceptance criteria**:
+- Every specific data point in the body has an inline citation number
+- Section headings are insights, not labels
+- Works cited is complete, deduplicated, and alphabetically sorted
+- File has no external dependencies — opens in any browser with no network access
 
 ---
 
@@ -275,11 +371,14 @@ The course context is intentionally stored in Claude's memory system (not the re
 
 | Component | Location | Purpose |
 |---|---|---|
-| Skills (slash commands) | `commands/*.md` → symlinked to `~/.claude/commands/` | Prompt files that define each skill's behavior |
-| Framework templates | `frameworks/*.md` → symlinked to `~/.claude/consultant-ai/frameworks/` | Application guides read by the `/framework` skill |
-| Framework index | `frameworks/index.md` | Maps domains to frameworks; read by `/consult` and `/structure` |
+| Root orchestrator | `SKILL.md` → symlinked to `~/.claude/commands/consult.md` | `/consult` — full end-to-end workflow |
+| Skills (slash commands) | `skills/[name]/SKILL.md` → symlinked to `~/.claude/commands/` | 10 individual skills: brief, add-course, structure, research, framework, draft, critique, review, publish, references |
+| Shared agent rules | `agents/shared-rules.md` | Cross-cutting consultant standards applied by all spawned agents |
+| Framework templates | `reference/frameworks/*.md` → symlinked to `~/.claude/consultant-ai/frameworks/` | Application guides read by the `/framework` skill |
+| Framework index | `reference/frameworks/index.md` | Maps domains to frameworks; read by `/consult` and `/structure` |
+| Output templates | `templates/slides.md`, `report.md`, `memo.md` | Format guides read by `/draft` |
 | Course context | `~/.claude/memory/consultant-ai-courses.md` | User-specific, not tracked in repo |
-| Setup script | `setup.sh` | Creates symlinks on installation |
+| Setup script | `setup.sh` | Creates all symlinks on installation |
 
 ### Design decisions
 
@@ -305,13 +404,13 @@ The course context is intentionally stored in Claude's memory system (not the re
 
 ---
 
-## 10. Limitations (v1)
+## 10. Limitations (v1.1)
 
-- **Text output only**: Does not generate formatted files (PowerPoint, PDF, Word). User copies content into their tool of choice.
-- **Secondary research only**: Uses web search for published sources. Cannot conduct interviews, surveys, or access paywalled databases.
+- **No native formatted file output**: Does not generate PowerPoint, PDF, or Word files. `/publish` produces a self-contained HTML report printable to PDF from any browser; user must manually format slides.
+- **Secondary research only**: Uses web search for published sources. Cannot conduct interviews, surveys, or access paywalled databases (JSTOR, EBSCO, ProQuest).
 - **Single user**: No collaboration, sharing, or multi-user state.
-- **No persistent project memory across sessions**: Research and drafts are not automatically saved between Claude Code sessions. User should save outputs manually.
-- **Framework library is curated, not exhaustive**: 15 frameworks cover the most common business school domains. Niche or advanced frameworks require manual addition.
+- **No persistent project memory across sessions**: Research, findings, and drafts are not automatically saved between Claude Code sessions. Use `/publish` and `/references` to write outputs to disk before closing a session.
+- **Framework library is curated, not exhaustive**: Templates cover the most common business school domains. Niche or advanced frameworks fall back to Claude's training knowledge without a calibrated application guide.
 
 ---
 
@@ -323,12 +422,12 @@ A structured review of missing capabilities across all dimensions of the plugin.
 
 ### 11.1 Output & Delivery
 
-| Gap | Why it matters | Complexity | Impact |
-|---|---|---|---|
-| **No file output** — draft content is text only, user must copy-paste into Google Slides, Word, etc. | Breaks flow; formatting is lost in translation; adds 30+ minutes of manual work per project | High (MCP + library like `python-pptx` or Pandoc) | High |
-| **No HTML export** — an intermediate `/draft html` could write a self-contained file to disk, printable to PDF from the browser | Solves 70% of the file output problem with Low complexity; no MCP server needed | Low (`Write` tool to `/outputs/` directory) | High |
-| **No Markdown tables for quantitative frameworks** — ratio analysis, Porter's force ratings, BCG positioning are described in prose instead of rendered as tables | Tables are standard in consulting deliverables; prose versions are harder to read and weaker analytically | Low (prompt update) | Medium |
-| **No citation file export** — references accumulate in chat but are never written to a `.md` or `.txt` file | Students need a clean, copyable reference list; manual extraction is error-prone | Low (`/draft references` command + `Write` tool) | High |
+| Gap | Why it matters | Complexity | Impact | Status |
+|---|---|---|---|---|
+| **No file output** — draft content is text only, user must copy-paste into Google Slides, Word, etc. | Breaks flow; formatting is lost in translation; adds 30+ minutes of manual work per project | High (MCP + library like `python-pptx` or Pandoc) | High | Open |
+| ~~**No HTML export**~~ | ~~Solves 70% of the file output problem with Low complexity~~ | ~~Low~~ | ~~High~~ | **Resolved** — `/publish` writes self-contained HTML report; `/references` writes clickable source verification page |
+| **No Markdown tables for quantitative frameworks** — ratio analysis, Porter's force ratings, BCG positioning are described in prose instead of rendered as tables | Tables are standard in consulting deliverables; prose versions are harder to read and weaker analytically | Low (prompt update) | Medium | Open |
+| ~~**No citation file export**~~ | ~~Students need a clean, copyable reference list; manual extraction is error-prone~~ | ~~Low~~ | ~~High~~ | **Resolved** — `/references` generates a full source verification HTML page with clickable links grouped by authority tier |
 
 ---
 
@@ -345,13 +444,13 @@ A structured review of missing capabilities across all dimensions of the plugin.
 
 ### 11.3 Research Quality
 
-| Gap | Why it matters | Complexity | Impact |
-|---|---|---|---|
-| **No contradiction detection** — parallel agents can return conflicting figures from different sources with no flag | Conflicting GDP figures or market sizes passed to synthesis create inaccurate analysis | Low (prompt update to synthesis step) | Medium |
-| **No source recency validation** — no check that data is within an acceptable date range for time-sensitive claims | Outdated statistics in academic or professional work undermine credibility | Low (prompt update) | Medium |
-| **No access to paywalled academic databases** — WebSearch returns open-web results; institutional databases (JSTOR, EBSCO, ProQuest) are inaccessible | Academic mode requires journal citations; web search may not surface sufficient tier-1a sources | High (browser automation or library API) | Medium |
-| **No structured company financial data source** — `/framework ratio-analysis` requires the user to supply the numbers | Applying ratio analysis without actual financials is a framework template, not analysis | High (API); Medium (agents scraping annual reports and IR pages) | High |
-| **No primary research scaffolding** — plugin handles secondary research only; no interview guides, survey templates, or qualitative synthesis | Professional consulting frequently requires primary research; some academic cases do too | Medium (new `/research-guide` skill) | Medium |
+| Gap | Why it matters | Complexity | Impact | Status |
+|---|---|---|---|---|
+| ~~**No contradiction detection**~~ | ~~Conflicting GDP figures or market sizes passed to synthesis create inaccurate analysis~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — 5 Advisors Contrarian agent actively tries to refute each key claim; DISPUTED claims are excluded from synthesis |
+| ~~**No source authority validation**~~ | ~~Outdated or secondary-only sources cited as fact undermine credibility~~ | ~~Low~~ | ~~Medium~~ | **Resolved** — 5 Advisors First Principles agent verifies primary source traceability; SECONDARY-ONLY and UNVERIFIABLE claims are confidence-scored and surfaced in Caveats |
+| **No access to paywalled academic databases** — WebSearch returns open-web results; institutional databases (JSTOR, EBSCO, ProQuest) are inaccessible | Academic mode requires journal citations; web search may not surface sufficient tier-1a sources | High (browser automation or library API) | Medium | Open |
+| **No structured company financial data source** — `/framework ratio-analysis` requires the user to supply the numbers | Applying ratio analysis without actual financials is a framework template, not analysis | High (API); Medium (agents scraping annual reports and IR pages) | High | Open |
+| **No primary research scaffolding** — plugin handles secondary research only; no interview guides, survey templates, or qualitative synthesis | Professional consulting frequently requires primary research; some academic cases do too | Medium (new `/research-guide` skill) | Medium | Open |
 
 ---
 
@@ -367,14 +466,14 @@ A structured review of missing capabilities across all dimensions of the plugin.
 
 ### 11.5 User Workflow
 
-| Gap | Why it matters | Complexity | Impact |
-|---|---|---|---|
-| **No iterative issue tree revision** — if research overturns the hypothesis, there is no `/structure update` flow | Consulting is iterative; the current flow treats the issue tree as immutable | Low (prompt update to `/structure`) | Medium |
-| **No `/compare` command** — after applying two frameworks to the same problem, there is no synthesis of where they agree or conflict | Students produce adjacent frameworks instead of integrated analysis; this is the most common quality gap in academic work | Low (new skill reading previous outputs) | Medium |
-| **No PDF brief parsing** — `/consult` mentions file upload but does not explicitly instruct itself to read a PDF; no dedicated `/brief` skill | Most academic assignments are delivered as PDFs; auto-parsing eliminates manual re-typing of criteria | Low (Read tool handles PDFs; prompt fix) | High |
-| **No `/help` command** — new users must exit to the README to find command syntax | Plugin discoverability drops without in-context help | Low (static markdown skill) | Medium |
-| **`/draft` requires manual context supply** — user must paste previous research and framework outputs if they used step-by-step skills | Significant friction after a manual workflow; breaks the step-by-step path | Medium (requires session state persistence) | High |
-| **No word/slide count enforcement** — `/draft` mentions constraints but does not flag when output exceeds them | Academic submissions have hard limits; over-length drafts require manual cutting | Low (prompt update) | Medium |
+| Gap | Why it matters | Complexity | Impact | Status |
+|---|---|---|---|---|
+| **No iterative issue tree revision** — if research overturns the hypothesis, there is no `/structure update` flow | Consulting is iterative; the current flow treats the issue tree as immutable | Low (prompt update to `/structure`) | Medium | Open |
+| **No `/compare` command** — after applying two frameworks to the same problem, there is no synthesis of where they agree or conflict | Students produce adjacent frameworks instead of integrated analysis; this is the most common quality gap in academic work | Low (new skill reading previous outputs) | Medium | Open |
+| ~~**No PDF brief parsing**~~ | ~~Most academic assignments are delivered as PDFs; auto-parsing eliminates manual re-typing of criteria~~ | ~~Low~~ | ~~High~~ | **Resolved** — `/brief` reads PDFs and text, extracts domain/mode/marking criteria/examiner intent/recommended frameworks |
+| **No `/help` command** — new users must exit to the README to find command syntax | Plugin discoverability drops without in-context help | Low (static markdown skill) | Medium | Open |
+| **`/draft` requires manual context supply** — user must paste previous research and framework outputs if they used step-by-step skills | Significant friction after a manual workflow; breaks the step-by-step path | Medium (requires session state persistence) | High | Open |
+| **No word/slide count enforcement** — `/draft` mentions constraints but does not flag when output exceeds them | Academic submissions have hard limits; over-length drafts require manual cutting | Low (prompt update) | Medium | Open |
 
 ---
 
@@ -428,13 +527,13 @@ Gaps ranked by impact and feasibility for near-term implementation.
 
 ### Near-term (Low complexity, High impact)
 1. **Expand framework templates** — write missing `.md` files for SWOT, Value Chain, 4Ps, DuPont, DCF, Blue Ocean, Make-vs-Buy, Business Model Canvas, Balanced Scorecard
-2. **HTML file output** — `/draft html` writes a self-contained file to disk; printable to PDF from browser
+2. ~~**HTML file output**~~ — **Done**: `/publish` writes a self-contained HTML report; `/references` writes a clickable source verification page
 3. **Citation style enforcement** — capture style in `/add-course`, apply in `/draft` and `/research`
-4. **PDF brief parsing** — fix `/consult` to explicitly read an attached PDF and extract brief + rubric
-5. **Citation file export** — `/draft references` writes a formatted reference list to disk
+4. ~~**PDF brief parsing**~~ — **Done**: `/brief` reads PDFs and text, extracts domain/marking criteria/examiner intent/frameworks
+5. ~~**Citation file export**~~ — **Done**: `/references` generates a full HTML source page with tier classification and clickable links
 6. **Word/slide count enforcement** — flag when output exceeds stated constraints
 7. **`/help` command** — in-context command reference
-8. **Contradiction detection in research** — prompt update to synthesis step in `/research`
+8. ~~**Contradiction detection in research**~~ — **Done**: 5 Advisors Contrarian agent flags DISPUTED claims; excluded from synthesis
 9. **`/compare` command** — integrate two framework outputs into a single synthesis
 10. **`/brief-reviewer` skill** — structured 1-page reviewer brief for professors or supervisors
 

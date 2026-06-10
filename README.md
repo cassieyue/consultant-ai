@@ -4,13 +4,15 @@ A Claude Code plugin that guides you through any business research project using
 
 ## What it does
 
-- Decodes any business brief and identifies the domain, deliverable format, and marking criteria
-- Structures problems as MECE issue trees with initial hypotheses (hypothesis-driven approach)
-- Selects and applies the right frameworks for the domain — automatically or on demand
-- Spawns parallel research agents to work multiple questions simultaneously
-- Synthesizes findings using the Pyramid Principle (answer first, then support)
-- Drafts consultant-quality output: slide decks, reports, or memos
-- Reviews work against marking criteria or consulting quality standards
+- Decodes any assignment brief (PDF or text) — extracts domain, marking criteria, examiner intent, and recommended frameworks
+- Structures problems as MECE issue trees with initial hypotheses before research begins
+- Shows a research plan and waits for confirmation before spawning agents — no silent 5-minute runs
+- Spawns parallel research agents, then validates key claims through a Contrarian + First Principles panel
+- Synthesizes only HIGH and MEDIUM confidence findings; flags DISPUTED and UNVERIFIED claims separately
+- Drafts consultant-quality output: slide decks, reports, or memos, using the Pyramid Principle throughout
+- Stress-tests the recommendation using the 5 Modes framework (Devil's Advocate, Contrarian Investor, Founder Thinking, First Principles, Therapist CEO)
+- Reviews work against marking criteria or consulting quality standards with a readiness score out of 10
+- Publishes a self-contained HTML report and a clickable references page for source verification
 
 Supports any business domain: strategy, marketing, finance, supply chain, information systems, international business, operations, or multi-domain.
 
@@ -202,25 +204,31 @@ flowchart TD
     Setup["/add-course\nRegister current courses and frameworks\nRun once per course — optional but recommended"]
     Setup -.->|informs framework selection| C
 
-    A([New project]) --> C{Choose approach}
+    A([New project]) --> B["/brief\nDecode the brief — domain · criteria · examiner intent"]
+    B --> C{Choose approach}
 
     C -->|Fully automated| D["/consult\nPaste your brief"]
     C -->|Step by step| E["/structure\nBuild MECE issue tree\nand initial hypothesis"]
 
-    D --> D1[Decode brief\ndomain · deliverable · criteria]
-    D1 --> D2[Select frameworks\ncourse-prioritized]
-    D2 --> D3[Parallel research agents\none per issue tree branch]
-    D3 --> D4[Synthesize findings\nPyramid Principle]
+    D --> D1[Confirmation gate\nShow plan · estimate time · approve]
+    D1 --> D2[Parallel research agents\none per issue tree branch]
+    D2 --> D3[5 Advisors validation\nContrarian + First Principles]
+    D3 --> D4[Synthesize HIGH/MEDIUM findings\nPyramid Principle]
     D4 --> F
 
-    E --> E1["/research\nParallel agents per branch"]
+    E --> E1["/research\nConfirmation gate → parallel agents\n→ 5 Advisors validation"]
     E1 --> E2["/framework\nApply frameworks to findings"]
     E2 --> F
 
     F["/draft\nSlides · Report · Memo"]
     F --> G["/review\nReadiness score + specific fixes"]
-    G -->|Needs revision| F
-    G -->|Ready| H([Submit])
+    G --> GC["/critique\n5 Modes stress-test\nWeakest link + 3 fixes"]
+    GC -->|Needs revision| F
+    GC -->|Ready| OUT[Output]
+
+    OUT --> P["/publish\nSelf-contained HTML report"]
+    OUT --> R["/references\nClickable source verification page"]
+    OUT --> S([Submit])
 ```
 
 ---
