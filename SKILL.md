@@ -13,7 +13,15 @@ The user may paste a brief, upload a file, or describe the problem in $ARGUMENTS
 
 ## Step 1 — Load context
 
-Read `~/.claude/memory/consultant-ai-courses.md` if it exists. Note any frameworks the user is currently studying — these take priority in framework selection.
+**Active project**: Read `~/.claude/memory/consultant-ai-active-project.md`. If a project name is stored there, read `~/.claude/projects/consultant-ai/[name].md` and ask the user:
+- **Continue [project name]** — restore context from the saved file and resume where it left off (skip to the first incomplete phase)
+- **Start a new project** — proceed with fresh context
+
+If no active project exists, proceed normally.
+
+**Run log**: Read `~/.claude/memory/consultant-ai-run-log.md` if it exists. When the user shares a brief, scan the run log for any prior project covering the same company or market. If found, surface it: "You researched [company/market] in a previous project ([project-name], [date]). Do you want to reference those findings?"
+
+**Course context**: Read `~/.claude/memory/consultant-ai-courses.md` if it exists. Note any frameworks the user is currently studying — these take priority in framework selection.
 
 ---
 

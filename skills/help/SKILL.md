@@ -110,16 +110,45 @@ CONSULTANT AI — SKILL REFERENCE
   Example: /references
   Example: /references ~/Documents/byd-nigeria-references.html
 
+── PROJECT MANAGEMENT ───────────────────────────────────
+
+/save [project-name]
+  Save the current session to a named project file for resuming later.
+  Captures: central question, hypothesis, research, frameworks, draft
+  status, review score, constraints. Also logs to the run log.
+  Example: /save byd-nigeria
+  Example: /save  (will prompt for a name)
+
+/load [project-name]
+  Load a saved project, restoring full context and showing where to resume.
+  Example: /load byd-nigeria
+  Example: /load  (shows list of saved projects to choose from)
+
+/status
+  Show a completion checklist for the current project — what's done,
+  what's pending, word/slide count vs. limit, and the single next step.
+  Example: /status
+
+/project [command]
+  Manage saved projects: create, list, switch, or delete.
+  Example: /project list
+  Example: /project new mg-mauritius
+  Example: /project switch supply-chain-analysis
+  Example: /project delete old-project
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TYPICAL WORKFLOW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 New project, fully automated:
-  /add-course → /brief → /consult → /review → /critique → /publish
+  /add-course → /brief → /consult → /review → /critique → /publish → /save
 
 New project, step by step:
   /add-course → /brief → /structure → /research → /framework
-  → /draft → /compare → /review → /critique → /publish + /references
+  → /draft → /compare → /review → /critique → /publish + /references → /save
+
+Resume a saved project:
+  /load [name] → /status → [continue from next step]
 
 Quick draft (no research):
   /brief → /draft → /review → /publish
