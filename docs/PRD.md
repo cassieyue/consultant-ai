@@ -521,34 +521,318 @@ A structured review of missing capabilities across all dimensions of the plugin.
 
 ---
 
-## 12. Future Opportunities (Prioritized)
+## 12. Roadmap
 
-Gaps ranked by impact and feasibility for near-term implementation.
+Milestones are sequenced by dependency and impact. Items within a milestone are independent and can be built in any order. v1.4 (session persistence) unlocks several items in v1.5 — do not attempt those before v1.4 is complete.
 
-### Near-term (Low complexity, High impact)
-1. **Expand framework templates** — write missing `.md` files for SWOT, Value Chain, 4Ps, DuPont, DCF, Blue Ocean, Make-vs-Buy, Business Model Canvas, Balanced Scorecard
-2. ~~**HTML file output**~~ — **Done**: `/publish` writes a self-contained HTML report; `/references` writes a clickable source verification page
-3. **Citation style enforcement** — capture style in `/add-course`, apply in `/draft` and `/research`
-4. ~~**PDF brief parsing**~~ — **Done**: `/brief` reads PDFs and text, extracts domain/marking criteria/examiner intent/frameworks
-5. ~~**Citation file export**~~ — **Done**: `/references` generates a full HTML source page with tier classification and clickable links
-6. **Word/slide count enforcement** — flag when output exceeds stated constraints
-7. **`/help` command** — in-context command reference
-8. ~~**Contradiction detection in research**~~ — **Done**: 5 Advisors Contrarian agent flags DISPUTED claims; excluded from synthesis
-9. **`/compare` command** — integrate two framework outputs into a single synthesis
-10. **`/brief-reviewer` skill** — structured 1-page reviewer brief for professors or supervisors
+---
 
-### Medium-term (Medium complexity, High impact)
-11. **Project state save/load** — `/save` and `/load` commands writing to a named project file
-12. **`/status` command** — shows phase completion, research coverage, review score
-13. **Rubric-weighted `/review`** — assessment weighted by actual marking criteria percentages
-14. **`/competitor` skill** — structured competitor profile using parallel research agents
-15. **Market sizing skill** — `/size [market]` with top-down arithmetic and sourced assumptions
-16. **Multi-project support** — namespaced project files, `/project` command set
-17. **Client context system** — `/client` command for professional mode, analogous to `/add-course`
-18. **Framework combination guidance** — "when to combine" sections + synthesis prompt in `/consult`
+### v1.2 — Academic quality polish
+**Goal**: Close the highest-impact gaps for the core academic use case with minimal architectural change. All items are prompt updates or small new skills.
 
-### Long-term (High complexity, High impact)
-19. **Formatted file generation** — `.pptx` and `.docx` export via MCP server
-20. **Quantitative modeling** — break-even, scenario, sensitivity, DCF via computational tools
-21. **Google Slides / Notion integration** — direct export to collaborative tools
-22. **Paywalled database access** — institutional library API or browser automation for journal retrieval
+---
+
+#### 12.1 Citation style enforcement
+**Gap**: Plugin extracts source requirements but never applies a specific citation style consistently.  
+**Files to change**:
+- `skills/add-course/SKILL.md` — add a "citation style" slot to the course registration form (Harvard, APA, Chicago, MLA — or "course default")
+- `skills/research/SKILL.md` — Step 6 (source formatting) reads the registered style and formats accordingly
+- `skills/draft/SKILL.md` — reference list at end of draft uses the registered style
+- `skills/publish/SKILL.md` — works cited section uses the registered style
+
+**Acceptance criteria**:
+- Running `/add-course` prompts for citation style and saves it to `consultant-ai-courses.md`
+- `/research` output formats every citation in the registered style
+- `/publish` works cited section matches the registered style exactly
+
+---
+
+#### 12.2 Rubric-weighted `/review`
+**Gap**: Review checklist is fixed — a 7/10 score does not account for whether the highest-weighted criterion was actually addressed proportionally.  
+**Files to change**:
+- `skills/review/SKILL.md` — at start, read marking criteria and weights from session context (or ask user to paste them); weight each checklist section by criterion percentage; score must reflect weighting (a 40% criterion failing = cannot score above 6/10)
+
+**Acceptance criteria**:
+- If marking criteria are present, readiness score reflects their weights — not a flat checklist
+- Critical issues explicitly reference criterion name and weight
+- "To reach 10/10" section maps fixes to specific criteria and weights
+
+---
+
+#### 12.3 Word and slide count enforcement
+**Gap**: `/draft` mentions constraints but never checks output length against them.  
+**Files to change**:
+- `skills/draft/SKILL.md` — after generating each section, track running word count or slide count; at the end, compare against stated constraint; if over, flag specific sections to trim and by how much
+
+**Acceptance criteria**:
+- After `/draft full`, output includes a count summary: "1,847 words / 2,000 word limit — 153 words to spare"
+- If over limit, names the longest sections and suggests specific cuts
+- Slide count tracked per slide; flags if deck exceeds stated limit
+
+---
+
+#### 12.4 Quantitative framework tables
+**Gap**: Financial ratios, Porter's force ratings, BCG positioning, and similar frameworks are described in prose instead of structured tables.  
+**Files to change**:
+- `reference/frameworks/ratio-analysis.md` — replace prose output format with a defined table structure (ratio | formula | company value | industry benchmark | signal)
+- `reference/frameworks/porters-five-forces.md` — force | evidence | strength rating (1–5) | implication
+- `reference/frameworks/bcg.md` — business unit | market share | growth rate | quadrant | recommendation
+
+**Acceptance criteria**:
+- `/framework ratio-analysis` produces a table, not a paragraph per ratio
+- Every quantitative framework outputs a table as its primary artifact
+- Prose explanation follows the table; does not replace it
+
+---
+
+#### 12.5 `/compare` skill
+**Gap**: No way to integrate two framework outputs or research findings into a combined synthesis showing where they agree, conflict, and what the combined implication is.  
+**Files to change**:
+- Create `skills/compare/SKILL.md`
+- `setup.sh` — add `compare` to the skill loop
+- `README.md` and `docs/PRD.md` — add skill documentation
+
+**Skill behaviour**: Takes two frameworks or research topics as arguments. Reads both outputs from session context. Produces: points of agreement, direct conflicts (with explanation of which to trust and why), combined implication for the central question.
+
+**Acceptance criteria**:
+- `/compare pestel hofstede` synthesises both analyses rather than restating them
+- Conflicts are resolved with a reasoned recommendation, not both sides presented equally
+- Combined implication is a single actionable sentence
+
+---
+
+#### 12.6 `/help` skill
+**Gap**: New users must leave the session to find command syntax.  
+**Files to change**:
+- Create `skills/help/SKILL.md` — static markdown listing all skills with one-line descriptions and example invocations; groups by workflow stage (setup → analyse → draft → QA → output)
+- `setup.sh` — add `help` to skill loop
+
+**Acceptance criteria**:
+- `/help` lists every skill with syntax and a one-line example
+- Output is scannable in under 30 seconds
+- Grouped by workflow stage, not alphabetically
+
+---
+
+### v1.3 — Framework library expansion
+**Goal**: Write the missing framework template files so `/framework` always uses a calibrated application guide rather than falling back to generic Claude knowledge.
+
+---
+
+#### 12.7 Missing framework templates
+**Gap**: 13+ frameworks listed in `reference/frameworks/index.md` have no template file.  
+**Files to create** (one `.md` per framework, same structure as existing templates):
+
+| Framework | Domain | Priority |
+|---|---|---|
+| SWOT Analysis | Strategy | High — most commonly assigned |
+| Marketing Mix (4Ps / 7Ps) | Marketing | High |
+| Value Chain Analysis | Strategy | High |
+| Business Model Canvas | Strategy | High |
+| Stakeholder Analysis | Any | High |
+| Balanced Scorecard | Strategy, Finance | Medium |
+| Blue Ocean Strategy | Strategy | Medium |
+| Make-vs-Buy Analysis | Supply Chain, Operations | Medium |
+| DuPont Analysis | Finance | Medium |
+| CVP / Break-even Analysis | Finance | Medium |
+| DCF Valuation (framework only) | Finance | Medium |
+| DMAIC / Lean Six Sigma | Operations | Low |
+| Risk Matrix | Any | Low |
+
+Each template must include: when to use, data to collect per dimension, output structure, "so what" standard, common mistakes.
+
+**Acceptance criteria**:
+- `/framework swot` uses the template, not generic knowledge
+- Every template produces a "so what" insight, not just a dimension summary
+- `reference/frameworks/index.md` updated with each new entry
+
+---
+
+#### 12.8 Framework combination guidance
+**Gap**: Frameworks are applied in silos; no guidance on how PESTEL feeds Porter's Five Forces, or how VRIO informs Modes of Entry.  
+**Files to change**:
+- Each relevant framework template — add a "Combines with" section: which frameworks to apply next, what output to pass, and what the combined analysis reveals
+- `SKILL.md` (`/consult`) — Step 4 (framework selection) recommends framework sequences, not just individual frameworks
+
+**Acceptance criteria**:
+- `/framework pestel` output ends with: "Feed the Political and Economic dimensions into Porter's Five Forces to assess how the macro environment shapes competitive intensity"
+- `/consult` recommends 2-framework sequences (e.g. PESTEL → Porter's) for strategy and international business briefs
+- At least 5 combination pairs documented across the library
+
+---
+
+### v1.4 — Session persistence
+**Goal**: Allow projects to span multiple sessions without re-running research. This milestone is a prerequisite for v1.5 items that depend on project state.
+
+---
+
+#### 12.9 `/save` and `/load` — Project state persistence
+**Gap**: All research, issue trees, framework outputs, and drafts are lost when the session closes.  
+**Files to change**:
+- Create `skills/save/SKILL.md` — collects all session artifacts (central question, hypothesis, issue tree, research findings with confidence scores, framework outputs, draft sections, review score, constraints) and writes them to `~/.claude/projects/consultant-ai/[project-name].md` in a structured format
+- Create `skills/load/SKILL.md` — reads the project file and restores context into the working session; confirms what was loaded and what the next logical step is
+- `setup.sh` — add `save` and `load` to skill loop
+
+**Project file format** (structured markdown):
+```
+# [Project name]
+Central question: ...
+Hypothesis: ...
+Mode: Academic / Professional
+Constraints: word count, slide count, deadline
+Marking criteria: [name] [weight%] ...
+Issue tree branches: [list]
+Research status: [branch] → [complete/pending]
+Framework outputs: [framework] → [summary]
+Draft status: [section] → [complete/pending]
+Review score: [N]/10
+Last updated: [date]
+```
+
+**Acceptance criteria**:
+- `/save` writes a complete, human-readable project file and confirms the path
+- `/load [project-name]` restores context and tells the user exactly where they left off and what to run next
+- Project files are stored outside the repo — never committed
+
+---
+
+#### 12.10 `/status` command
+**Gap**: No way to see project completion state at a glance.  
+**Dependency**: Requires 12.9 (`/save`/`/load`) for multi-session use; works within a single session without it.  
+**Files to change**:
+- Create `skills/status/SKILL.md` — reads session context (or project file if loaded) and produces a completion checklist: issue tree branches researched (✓/✗), frameworks applied (✓/✗), draft sections complete (✓/✗), review run (✓/✗), /critique run (✓/✗), outputs published (✓/✗)
+
+**Acceptance criteria**:
+- `/status` output fits on one screen
+- Each incomplete item links to the command that would complete it: "Research: 2/4 branches complete — run `/research [branch 3]` next"
+- Shows constraint status: word count used vs. allowed (if draft exists)
+
+---
+
+#### 12.11 Multi-project support
+**Gap**: Course context is global; a student running 3 concurrent assignments has no way to context-switch.  
+**Dependency**: Requires 12.9 (project state file format).  
+**Files to change**:
+- Create `skills/project/SKILL.md` — handles `/project new [name]`, `/project list`, `/project switch [name]`, `/project delete [name]`
+- `skills/save/SKILL.md` — save defaults to active project
+- `skills/load/SKILL.md` — load sets the active project
+- `~/.claude/memory/consultant-ai-active-project.md` — one-line file tracking the active project name
+
+**Acceptance criteria**:
+- `/project new` creates a named project file and sets it as active
+- `/project list` shows all saved projects with last-updated date and status
+- `/project switch` loads a different project and confirms what context changed
+- `/consult` checks for an active project at startup and offers to continue it or start a new one
+
+---
+
+#### 12.12 Episodic run log
+**Gap**: No record of past work; plugin cannot reference what was researched in previous assignments.  
+**Dependency**: Requires 12.9 (project state format).  
+**Files to change**:
+- `skills/save/SKILL.md` — after writing the project file, append a one-line summary to `~/.claude/memory/consultant-ai-run-log.md`: date, project name, central question, recommendation (one sentence), frameworks used
+- `SKILL.md` (`/consult`) — Step 1 (load context) also reads the run log; if a prior project covered the same company or market, surface it: "You researched Nigeria's regulatory environment in March — do you want to load those findings?"
+
+**Acceptance criteria**:
+- Each `/save` appends a dated entry to the run log
+- `/consult` surfaces relevant prior research when company or market overlaps with a previous project
+- Run log entries older than 6 months are pruned on `/save`
+
+---
+
+### v1.5 — New skills and professional mode
+**Goal**: Add skills that serve both academic and professional users, and extend professional mode with the context system it currently lacks.
+
+---
+
+#### 12.13 `/competitor` skill
+**Gap**: No structured way to profile a competitor.  
+**Files to change**:
+- Create `skills/competitor/SKILL.md` — takes company name as argument; spawns parallel agents covering: financials and recent results, products and positioning, strategy and recent moves, leadership and org, known weaknesses and vulnerabilities; synthesises into a one-page profile with a "threat assessment" concluding section
+- `setup.sh`, `README.md`, `docs/PRD.md`
+
+**Acceptance criteria**:
+- Profile produced in under 5 minutes with confirmation gate before agents spawn
+- Every claim sourced; confidence tier shown for each key fact
+- Concluding "threat assessment" is a specific 2–3 sentence judgement, not a list
+
+---
+
+#### 12.14 `/size` — Market sizing skill
+**Gap**: No structured market sizing; TAM/SAM/SOM estimates are not defensible without a model.  
+**Files to change**:
+- Create `skills/size/SKILL.md` — takes market description as argument; builds a top-down sizing model (total addressable population → penetration rate → average spend → TAM) and a bottom-up check (unit economics × addressable customers); shows all assumptions with sources; surfaces sensitivity (what changes if penetration assumption is wrong by 2×)
+- `setup.sh`, `README.md`, `docs/PRD.md`
+
+**Acceptance criteria**:
+- Every assumption in the model is sourced or explicitly flagged as a reasoned estimate
+- Top-down and bottom-up figures are compared; if they diverge >2×, explains why
+- Sensitivity table shows TAM range under pessimistic/base/optimistic penetration assumptions
+
+---
+
+#### 12.15 `/client` — Client context system (professional mode)
+**Gap**: Professional mode has no persistent client context; every session starts from scratch.  
+**Files to change**:
+- Create `skills/client/SKILL.md` — analogous to `/add-course`; saves client name, industry, known risk tolerance, key stakeholders, engagement history notes to `~/.claude/memory/consultant-ai-clients.md`
+- `SKILL.md` (`/consult`) — in professional mode, reads client context alongside course context
+- `setup.sh`, `README.md`, `docs/PRD.md`
+
+**Acceptance criteria**:
+- `/client [name]` prompts for industry, risk profile, key stakeholder priorities, notes; saves to memory
+- `/consult` in professional mode surfaces relevant client context at Step 1 and uses it to calibrate tone and recommendation specificity
+- Multiple clients can be registered; active client can be switched
+
+---
+
+#### 12.16 Additional deliverable formats
+**Gap**: `/draft` supports slides, report, and memo only; board briefings and steering committee formats are missing.  
+**Files to change**:
+- `templates/board-brief.md` — new template: 1-page board briefing format (situation, decision required, recommendation, financial impact, risks, ask)
+- `templates/issue-action-log.md` — new template: issue | owner | action | deadline | status
+- `skills/draft/SKILL.md` — add both formats to the format selection step
+
+**Acceptance criteria**:
+- `/draft board brief` produces a 1-page output matching the template format
+- `/draft issue-action log` produces a structured table with all open items from the session
+
+---
+
+### v2.0 — Platform and integration
+**Goal**: Solve the remaining high-complexity gaps that require external tools, APIs, or MCP servers. These are not blocked on earlier milestones but require more engineering investment.
+
+---
+
+#### 12.17 PowerPoint / PPTX export
+**Gap**: Most important destination for slide output is a formatted deck, not HTML.  
+**Implementation approach**: MCP server using `python-pptx`; skill sends structured slide content (title, bullets, speaker notes) to the MCP tool which writes a `.pptx` file. Alternative: Pandoc PPTX output from Markdown.  
+**Files to change**: New MCP server (`mcp/pptx-export/`); `skills/publish/SKILL.md` — add `pptx` as an output format option; `setup.sh` — install MCP server on setup.
+
+**Acceptance criteria**:
+- `/publish pptx` writes a `.pptx` file with one slide per section
+- Each slide has title (insight header), bullet points, and speaker notes
+- File opens correctly in PowerPoint and Google Slides
+
+---
+
+#### 12.18 Quantitative modeling
+**Gap**: Break-even, scenario analysis, sensitivity, and DCF cannot be computed.  
+**Implementation approach**: Python computation via MCP `secure_bash` tool or a dedicated calculation MCP server. Skill prompts for assumptions, passes them to the computation tool, returns formatted output with a data table and a narrative interpretation.  
+**Files to change**: `reference/frameworks/dcf.md`, `reference/frameworks/break-even.md` — add computation instructions alongside analytical guidance; `skills/framework/SKILL.md` — detect quantitative frameworks and route to computation path.
+
+**Acceptance criteria**:
+- `/framework dcf` prompts for inputs (revenue, growth rate, discount rate, terminal multiple), computes the model, and returns a valuation range with sensitivity table
+- `/framework break-even` returns break-even units and revenue given fixed costs, variable cost, and price
+- All computation results include a plain-English interpretation
+
+---
+
+#### 12.19 Paywalled database access
+**Gap**: Academic mode requires journal citations but WebSearch cannot access JSTOR, EBSCO, or ProQuest.  
+**Implementation approach**: Browser automation via MCP (Playwright or Puppeteer) to authenticate with institutional library credentials and retrieve full-text PDFs; alternatively, OpenAlex and Semantic Scholar APIs are free and cover a large portion of academic literature.  
+**Files to change**: New MCP tool for academic search; `skills/research/SKILL.md` — in academic mode, route Tier 1 source requests through the academic search MCP before falling back to WebSearch.
+
+**Acceptance criteria**:
+- In academic mode, at least one Tier 1 (peer-reviewed) source is attempted per sub-question via the academic search path
+- Full citations include DOI and volume/issue/page where available
+- Gracefully falls back to WebSearch if the academic search returns no results
