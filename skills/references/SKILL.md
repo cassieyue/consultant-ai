@@ -7,7 +7,7 @@ You are compiling a verification-ready references list from all sources cited in
 
 Output path: **$ARGUMENTS**
 
-If $ARGUMENTS is empty, save to `~/Documents/[project-name]-references.html`. Infer the project name from the session context. If unclear, ask.
+If $ARGUMENTS is empty, save to `~/Documents/projects/[project-name]/[project-name]-references.html`. Infer the project name from the session context. If unclear, ask.
 
 ---
 

@@ -17,7 +17,7 @@ If $ARGUMENTS provides a path or filename, use it exactly.
 
 If $ARGUMENTS is empty, ask the user:
 - What is the project name? (used for the filename)
-- Where should the file be saved? (default: `~/Documents/[project-name]-report.html`)
+- Where should the file be saved? (default: `~/Documents/projects/[project-name]/[project-name]-report.html`)
 
 Confirm the full absolute path before writing.
 
