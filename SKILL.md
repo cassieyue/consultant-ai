@@ -64,7 +64,29 @@ Read `~/.claude/consultant-ai/frameworks/index.md` for domain-to-framework mappi
 
 ---
 
-## Step 5 — Research (parallel agents)
+## Step 5 — Research confirmation gate
+
+Before spawning any agents, present the research plan and wait for explicit user approval.
+
+Show the user:
+- The central question
+- Each sub-question that will be researched (one agent per sub-question)
+- The number of agents and estimated time (~2–4 minutes per agent, running in parallel)
+
+Then ask using AskUserQuestion:
+
+**Question**: "Ready to begin research? I'll spawn [N] parallel agents — this takes approximately 3–5 minutes."
+- **Full research** (recommended): Spawn all [N] agents, then validate key claims with the 5 Advisors. Best output quality.
+- **Quick draft**: Skip research entirely — draft from general knowledge only. Fast but unverified.
+- **Edit scope**: Let me adjust the sub-questions or reduce agent count before proceeding.
+
+If **Full research**: proceed to Step 5a.
+If **Quick draft**: skip to Step 6. Note in the output that findings are not research-backed.
+If **Edit scope**: show the sub-questions as a numbered list, ask what to change, then re-present the confirmation.
+
+---
+
+## Step 5a — Research (parallel agents)
 
 Spawn parallel agents — one per major sub-question in the issue tree. Brief each agent with:
 - The specific sub-question to answer
@@ -74,7 +96,70 @@ Spawn parallel agents — one per major sub-question in the issue tree. Brief ea
 
 Use the Agent tool with `subagent_type: "general-purpose"` for each. Run all agents simultaneously in a single message.
 
-Wait for all agents to complete, then synthesize their findings.
+Wait for all agents to complete.
+
+**Error recovery**: Once agents return, check completeness before proceeding:
+- **All agents completed** → proceed normally
+- **Some agents failed or returned empty output** → report which sub-questions are missing, show what did complete, then ask using AskUserQuestion: "How would you like to proceed?" — "Retry failed agents | Continue with [N]/[total] sub-questions | Abort"
+- **All agents failed** → report the failure clearly and ask to retry or abort
+- Do not proceed to synthesis if fewer than 2 sub-questions have usable findings
+
+---
+
+## Step 5b — Validate key claims (5 Advisors)
+
+After all research agents have completed, identify the 5–8 most important factual claims in the findings — the claims that most directly support or challenge the initial hypothesis.
+
+Spawn two validation agents in parallel:
+
+**Contrarian agent** brief:
+```
+You are the Contrarian advisor in a consulting validation panel. Your job is to challenge claims — not to be balanced, but to actively try to refute each one.
+
+For each claim below:
+1. Search for contradicting evidence
+2. Check whether the source could be outdated, biased, or misrepresenting the data
+3. Look for counter-examples or more recent data that undermines the claim
+
+Claims to challenge:
+[list each key claim with its attributed source]
+
+For each claim return:
+- HOLDS — you found no credible refutation
+- REFUTED — you found specific contradicting evidence (cite it)
+- UNCERTAIN — the claim may be true but you found reasons to doubt it (explain)
+```
+
+**First Principles agent** brief:
+```
+You are the First Principles advisor in a consulting validation panel. Your job is to verify what can be traced to a primary source — official government data, peer-reviewed research, or direct institutional records.
+
+For each claim below, determine whether it can be verified from a primary source.
+
+Claims to verify:
+[list each key claim with its attributed source]
+
+For each claim return:
+- PRIMARY-VERIFIED — traceable to a government/academic/institutional primary source (name it)
+- SECONDARY-ONLY — sourced only from news, blogs, or secondary reporting (no primary source found)
+- UNVERIFIABLE — no credible source found for this claim
+```
+
+Wait for both validators.
+
+**Error recovery**: If either validation agent fails or returns unusable output, proceed without it — note in the synthesis that confidence scores are partial. Do not block the analysis on a validation failure.
+
+Then assign each claim a confidence tier:
+
+| Contrarian | First Principles | Confidence |
+|---|---|---|
+| HOLDS | PRIMARY-VERIFIED | **HIGH** — use freely |
+| HOLDS | SECONDARY-ONLY | **MEDIUM** — use with caveat |
+| UNCERTAIN | any | **FLAG** — present with qualification |
+| REFUTED | any | **DISPUTED** — do not use; present as contested |
+| any | UNVERIFIABLE | **UNVERIFIED** — exclude or mark clearly |
+
+Build Step 6 synthesis only on HIGH and MEDIUM findings. Present any DISPUTED or UNVERIFIED claims in a separate "Caveats and Limitations" note.
 
 ---
 

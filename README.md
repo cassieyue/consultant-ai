@@ -33,6 +33,18 @@ Then restart Claude Code for the new skills to appear.
 
 ## Skills
 
+### `/brief [file path or pasted text]`
+Decode any assignment brief before starting analysis. Extracts domain, deliverable format, marking criteria with weights, constraints, and reads between the lines to tell you what the examiner actually wants. Also flags which frameworks from your registered courses apply.
+
+```
+/brief
+/brief ~/Documents/assignments/AE1-brief.pdf
+```
+
+Run this first on any new project — it takes 10 seconds and prevents misreading the brief downstream.
+
+---
+
 ### `/consult`
 The main orchestrator. Start here for any new project.
 
@@ -106,12 +118,38 @@ Slide headers are written as insights, not labels. Academic mode maps content to
 
 ---
 
+### `/critique`
+Stress-test a recommendation or plan using the 5 Modes framework before submission. Selects 2–3 analytical lenses based on what is being evaluated (recommendation logic, market selection, strategic direction, plan feasibility, or root cause analysis) and returns specific, named weaknesses — not generic pushback. Ends with a single "weakest link" and three prioritised fixes.
+
+```
+/critique
+/critique [paste recommendation text]
+```
+
+Runs after `/draft` or `/review`. Where `/review` checks completeness and structure, `/critique` applies adversarial pressure — it assumes the work is complete and asks whether it would hold up under challenge.
+
+Modes available: Devil's Advocate · Contrarian Investor · Founder Thinking · First Principles · Therapist CEO
+
+---
+
 ### `/review`
 Senior partner QA review. Checks structure (MECE, Pyramid Principle), content quality (specific claims, correct framework application, clear recommendation), source authority, academic compliance, and consulting writing standards. Returns a readiness score out of 10 with specific fixes.
 
 ```
 /review
 ```
+
+---
+
+### `/references [output path]`
+Generate a standalone HTML page with every source from the session as a clickable link. Sources are grouped by authority tier (Academic → Institutional → Specialist press → General press), each card shows what the source was used to claim, and there's a live search filter. Run after `/consult` or `/research` to verify sources before submitting.
+
+```
+/references
+/references ~/Documents/byd-nigeria-references.html
+```
+
+Sources with no URL are listed as unlinked — the skill never invents URLs.
 
 ---
 
@@ -206,12 +244,15 @@ consultant-ai/
 ├── SKILL.md               # Root orchestrator (/consult) — symlinked to ~/.claude/commands/consult.md
 ├── skills/                # Individual skills — each symlinked to ~/.claude/commands/
 │   ├── add-course/SKILL.md
+│   ├── brief/SKILL.md
 │   ├── structure/SKILL.md
 │   ├── research/SKILL.md
 │   ├── framework/SKILL.md
 │   ├── draft/SKILL.md
+│   ├── critique/SKILL.md
 │   ├── review/SKILL.md
-│   └── publish/SKILL.md
+│   ├── publish/SKILL.md
+│   └── references/SKILL.md
 ├── agents/
 │   └── shared-rules.md    # Cross-cutting consultant standards for spawned agents
 ├── reference/
