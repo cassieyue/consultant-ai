@@ -200,7 +200,17 @@ Format based on what's required:
 
 **Report/Memo**: Open with SCQA (Situation → Complication → Question → Answer). Each section leads with the key finding. Short paragraphs, direct language.
 
-**Academic**: Ensure every marking criterion is explicitly addressed, weighted by its percentage. Include properly formatted references.
+**Board brief**: Strict 1-page format. Situation (2–3 sentences) → Decision Required (1 sentence) → Recommendation + 3 evidence bullets → Financial Impact table (investment / return / payback) → Top Risks (2–3 + mitigation) → The Ask (checkboxes). Lead with the decision, not the background. Read `templates/board-brief.md` for the full spec.
+
+**Issue-action log**: Structured tracker for open items from the analysis. Each row: Issue/Action | Owner (one named person) | Action Required | Deadline | Status. Read `templates/issue-action-log.md` for the full spec.
+
+**Academic**: Ensure every marking criterion is explicitly addressed, weighted by its percentage. Apply the citation style registered in course context (default: Harvard).
+
+---
+
+## Step 8 — Close
+
+After delivering the output, prompt the user to run `/save [project-name]` to persist the session before closing. Remind them only once — do not repeat it.
 
 ---
 
