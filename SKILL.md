@@ -44,6 +44,8 @@ Extract and present to the user:
 
 Confirm this reading with the user before proceeding.
 
+**Project slug**: Derive a short kebab-case slug from the company or subject (e.g. `journeys`, `byd-nigeria`, `apple-strategy`). Store it as `[project-name]`. The workbook file will be written to `~/Documents/projects/[project-name]/[project-name]-workbook.html`.
+
 ---
 
 ## Step 3 — Frame the problem
@@ -60,6 +62,8 @@ Build a MECE issue tree:
 4. For each sub-question, identify what evidence would confirm or deny the hypothesis
 
 Show the issue tree to the user. Get confirmation before moving to research.
+
+**Workbook — Stage 1**: Once the user confirms, use the Write tool to create `~/Documents/projects/[project-name]/[project-name]-workbook.html`. Write Stage 1 as complete (brief decode + issue tree + initial hypothesis). Write Stages 2–6 as `badge-pending` with `<div class="pending-block">Not yet reached.</div>`. Use the CSS and HTML structure from `skills/workbook/SKILL.md`. Tell the user: "Workbook started at `~/Documents/projects/[project-name]/[project-name]-workbook.html` — it updates after each approved stage."
 
 ---
 
@@ -98,8 +102,8 @@ Then ask using AskUserQuestion:
 - **Quick draft**: Skip research entirely — draft from general knowledge only. Fast but unverified.
 - **Edit scope**: Let me adjust the sub-questions or reduce agent count before proceeding.
 
-If **Full research**: proceed to Step 5a.
-If **Quick draft**: skip to Step 6. Note in the output that findings are not research-backed.
+If **Full research**: use the Write tool to update the workbook — mark Stage 2 complete with the full framework chain content, keep Stages 3–6 as pending. Then proceed to Step 5a.
+If **Quick draft**: update workbook — mark Stage 2 complete, skip to Step 6. Note in the output that findings are not research-backed.
 If **Edit scope**: show the sub-questions as a numbered list, ask what to change, then re-present the confirmation.
 
 ---
@@ -121,6 +125,33 @@ Wait for all agents to complete.
 - **Some agents failed or returned empty output** → report which sub-questions are missing, show what did complete, then ask using AskUserQuestion: "How would you like to proceed?" — "Retry failed agents | Continue with [N]/[total] sub-questions | Abort"
 - **All agents failed** → report the failure clearly and ask to retry or abort
 - Do not proceed to synthesis if fewer than 2 sub-questions have usable findings
+
+**Stage output — Research Findings**: Once all agents return, present findings to the user before proceeding. Format as a clearly labeled block:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STAGE 3 — RESEARCH FINDINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Sub-question 1: [question text]
+• [finding with source]
+• [finding with source]
+↳ So what: [one sentence on implication for the central question]
+
+Sub-question 2: [question text]
+• [finding with source]
+• [finding with source]
+↳ So what: [one sentence on implication]
+
+[repeat for each sub-question]
+
+Proceeding to claim validation…
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Output this block to the user, then ask using AskUserQuestion:
+- **"Looks good — run validation"** (recommended): use the Write tool to update the workbook — mark Stage 3 complete with all findings (every sub-question, bullets with sources, "so what" implications) plus a sources table at the bottom of Stage 3 listing every source cited across all agents: title (linked), publication, year, one-sentence summary of what it was used to establish, and which sub-question it belongs to. Keep Stages 4–6 as pending. Then proceed to Step 5b.
+- **"Dig deeper on a sub-question"**: ask which sub-question and what to re-research, re-run that agent, then re-present Stage 3 before asking again
 
 ---
 
@@ -179,6 +210,30 @@ Then assign each claim a confidence tier:
 
 Build Step 6 synthesis only on HIGH and MEDIUM findings. Present any DISPUTED or UNVERIFIED claims in a separate "Caveats and Limitations" note.
 
+**Stage output — Claim Validation**: Present the full confidence table to the user before proceeding:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STAGE 4 — CLAIM VALIDATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Claim                          | Contrarian | First Principles | Confidence
+[claim text]                   | HOLDS      | PRIMARY-VERIFIED | HIGH ✓
+[claim text]                   | HOLDS      | SECONDARY-ONLY   | MEDIUM ~
+[claim text]                   | UNCERTAIN  | SECONDARY-ONLY   | FLAG ⚠
+[claim text]                   | REFUTED    | PRIMARY-VERIFIED | DISPUTED ✗
+
+Carrying HIGH + MEDIUM claims into synthesis.
+Flagged/disputed claims noted in Caveats section.
+
+Proceeding to synthesis…
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+Output this block to the user, then ask using AskUserQuestion:
+- **"Looks good — synthesize"** (recommended): use the Write tool to update the workbook — mark Stage 4 complete with the full confidence table (all claims, all verdicts, all tiers, caveats note), keep Stages 5–6 as pending. Then proceed to Step 6.
+- **"Challenge a claim"**: ask which claim to re-examine and what the concern is, then update the confidence tier and re-present the table before asking again
+
 ---
 
 ## Step 6 — Synthesize
@@ -190,15 +245,59 @@ Apply the **Pyramid Principle**:
 
 Every data point must answer "so what?" — the implication for the decision, not just the fact.
 
+**Stage output — Synthesis**: Present the full Pyramid structure to the user before drafting:
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STAGE 5 — SYNTHESIS (Pyramid Principle)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ANSWER
+[The recommendation or conclusion, stated in one sentence]
+
+ARGUMENT 1: [Key supporting point — MECE]
+  Evidence: [specific data point with source]
+  So what: [implication for the decision]
+
+ARGUMENT 2: [Key supporting point — MECE]
+  Evidence: [specific data point with source]
+  So what: [implication for the decision]
+
+ARGUMENT 3: [Key supporting point — MECE]
+  Evidence: [specific data point with source]
+  So what: [implication for the decision]
+
+[CAVEATS — if any DISPUTED or FLAG claims exist]
+  • [claim] — [why it is contested]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+After presenting this block, ask the user using AskUserQuestion:
+- **"Looks good — draft the deliverable"** — use the Write tool to update the workbook — mark Stage 5 complete with the full Pyramid (answer, all arguments with evidence and so-what, hypothesis verdict), mark Stage 6 as pending. Then proceed to Step 7.
+- **"Adjust the argument"** — let me change one of the supporting points before drafting
+
 ---
 
 ## Step 7 — Draft the deliverable
 
-Format based on what's required:
+**Before drafting any HTML output**, ask the user using AskUserQuestion:
 
-**Slides**: Each slide header IS the insight ("The market is growing at 12% CAGR" not "Market Analysis"). Bullets support the header. 3–5 bullets max. Describe any charts/visuals.
+**Question**: "How should the output be formatted?"
+- **Horizontal deck** — full-screen slides, one per viewport, arrow-key/button navigation, slide counter. Best for presenting to an audience.
+- **Vertical report** — continuous scroll with a table of contents, dense sections, inline citations. Best for async reading and sharing.
+- **Other** — board brief, memo, issue-action log, or academic format (describe what you need).
 
-**Report/Memo**: Open with SCQA (Situation → Complication → Question → Answer). Each section leads with the key finding. Short paragraphs, direct language.
+Then draft accordingly.
+
+---
+
+**Horizontal deck (HTML)**: Write a self-contained HTML file where each slide is a full-viewport `<section>`. Navigation: left/right arrow keys + on-screen prev/next buttons + slide counter (e.g. "3 / 10"). No vertical scrolling within a slide. Each slide header IS the insight. 3–5 bullets per slide max. Fixed navigation bar at top with slide titles.
+
+**Vertical report (HTML)**: Open with SCQA (Situation → Complication → Question → Answer). Each section leads with the key finding. Table of contents at top. Short paragraphs, direct language. Inline citation superscripts linked to a works-cited section at the bottom.
+
+**Slides (non-HTML)**: Each slide header IS the insight ("The market is growing at 12% CAGR" not "Market Analysis"). Bullets support the header. 3–5 bullets max. Describe any charts/visuals.
+
+**Report/Memo (non-HTML)**: Open with SCQA (Situation → Complication → Question → Answer). Each section leads with the key finding. Short paragraphs, direct language.
 
 **Board brief**: Strict 1-page format. Situation (2–3 sentences) → Decision Required (1 sentence) → Recommendation + 3 evidence bullets → Financial Impact table (investment / return / payback) → Top Risks (2–3 + mitigation) → The Ask (checkboxes). Lead with the decision, not the background. Read `templates/board-brief.md` for the full spec.
 
@@ -206,11 +305,17 @@ Format based on what's required:
 
 **Academic**: Ensure every marking criterion is explicitly addressed, weighted by its percentage. Apply the citation style registered in course context (default: Harvard).
 
+After producing the deliverable, use the Write tool to update the workbook — mark Stage 6 complete with the deliverable file path, format, and a one-sentence description of what was produced.
+
 ---
 
 ## Step 8 — Close
 
-After delivering the output, prompt the user to run `/save [project-name]` to persist the session before closing. Remind them only once — do not repeat it.
+After delivering the output, tell the user:
+- Run `/save [project-name]` to persist the session
+- The workbook at `~/Documents/projects/[project-name]/[project-name]-workbook.html` is complete — all 6 stages written
+
+Remind them only once — do not repeat it.
 
 ---
 
